@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { observer } from "mobx-react-lite"
 import { gameStore } from "@/game/store/GameStore"
 import { Button } from "@/components/ui/button"
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { isAdjacent, getDirectionBetween } from "@/game/engine/movement"
 import { getDoorAfterRotation } from "@/game/engine/rotation"
-import { Move } from "lucide-react"
+import { Move, Zap, Coins, Hammer, Users, Trophy } from "lucide-react"
 import type { Direction } from "@/game/types/game"
 
 export const TileDetailsPanel = observer(() => {
@@ -58,23 +59,22 @@ export const TileDetailsPanel = observer(() => {
     }
   }
 
-  const colorClasses: Record<string, string> = {
-    starter: "bg-gray-600",
-    orange: "bg-orange-600",
-    green: "bg-green-600",
-    blue: "bg-blue-600",
-    purple: "bg-purple-600",
+  const borderColorClasses: Record<string, string> = {
+    starter: "border-gray-600",
+    orange: "border-orange-600",
+    green: "border-green-600",
+    blue: "border-blue-600",
+    purple: "border-purple-600",
   }
 
   return (
     <div className="h-full overflow-auto p-4 space-y-4">
       {/* Tile image */}
-      <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 border-border">
+      <div className={`relative w-full aspect-square rounded-lg overflow-hidden border-4 ${borderColorClasses[selectedTile.template.color]}`}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${selectedTile.template.backgroundImageUrl})` }}
         />
-        <div className={`absolute inset-0 ${colorClasses[selectedTile.template.color]} opacity-40`} />
       </div>
 
       {/* Tile info */}
@@ -112,29 +112,118 @@ export const TileDetailsPanel = observer(() => {
         )}
 
         {selectedTile.template.actions && selectedTile.template.actions.length > 0 && (
-          <CardContent className="space-y-2">
-            <h4 className="font-medium text-sm mb-2">Actions</h4>
-            {selectedTile.template.actions.map((action) => {
-              const isClaimed = selectedTile.claimedActions.includes(action.id)
-              const canUse = isCurrentTile && !isClaimed && state.gameStatus === "playing"
+          <CardContent className="space-y-4">
+            {selectedTile.template.actions.map((action, actionIndex) => {
+              const usage = gameStore.getActionUsage(selectedTile, action.id)
+              const isClaimed = !action.maxUses && selectedTile.claimedActions.includes(action.id)
+              const hasEnoughResources = !action.cost || gameStore.canAfford(action.cost)
+              const missingResources = action.cost ? gameStore.getMissingResources(action.cost) : {}
+              const canUse = isCurrentTile && !usage.isComplete && state.gameStatus === "playing" && hasEnoughResources
+              const isFocused = state.focusMode === "details" && (state.focusedActionIndex || 0) === actionIndex
 
               return (
-                <Card key={action.id} className={isClaimed ? "opacity-50" : ""}>
+                <div key={action.id} className={`space-y-2 ${usage.isComplete ? "opacity-50" : ""} ${isFocused ? "ring-2 ring-primary rounded-lg p-2 -m-2" : ""}`}>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-base">{action.label}</h4>
+                    {action.maxUses && (
+                      <span className="text-base text-muted-foreground">
+                        {usage.current}/{usage.max} uses
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-base text-muted-foreground">{action.description}</p>
+                  
+                  {action.cost && (
+                    <div className="flex items-center gap-2 text-base">
+                      <span className="text-muted-foreground">Cost:</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {formatResourcesWithIcons(action.cost, true)}
+                      </div>
+                    </div>
+                  )}
+                  {(action.effect && Object.keys(action.effect).length > 0) || action.vpFlat ? (
+                    <div className="flex items-center gap-2 text-base">
+                      <span className="text-muted-foreground">Reward:</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {action.effect && Object.keys(action.effect).length > 0 && formatResourcesWithIcons(action.effect, false)}
+                        {action.vpFlat && (
+                          <div className="flex items-center gap-2">
+                            <Trophy className="w-6 h-6 text-orange-500" />
+                            <span className="text-base">+{action.vpFlat} VP</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                  
+                  <Button 
+                    size="sm" 
+                    className={`w-full ${isFocused ? "ring-2 ring-primary ring-offset-2" : ""}`}
+                    disabled={!canUse} 
+                    onClick={() => gameStore.claimAction(action.id)}
+                    ref={(el) => {
+                      if (isFocused && el) {
+                        el.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                      }
+                    }}
+                  >
+                    {usage.isComplete
+                      ? "Complete"
+                      : isCurrentTile
+                        ? action.maxUses
+                          ? `Use (${usage.current}/${usage.max})`
+                          : "Use"
+                        : "Not Here"}
+                  </Button>
+                  {!canUse && isCurrentTile && !usage.isComplete && !hasEnoughResources && Object.keys(missingResources).length > 0 && (
+                    <div className="flex items-center gap-2 text-xs text-destructive mt-1">
+                      <span>Missing:</span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {formatResourcesWithIcons(missingResources, true)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </CardContent>
+        )}
+
+        {selectedTile.template.passiveAbilities && selectedTile.template.passiveAbilities.length > 0 && (
+          <CardContent className="space-y-2">
+            <h4 className="font-medium text-sm mb-2">Passive Abilities</h4>
+            {selectedTile.template.passiveAbilities.map((passive) => {
+              const colorNames: Record<string, string> = {
+                orange: "Orange",
+                green: "Green",
+                blue: "Blue",
+                purple: "Purple",
+              }
+
+              return (
+                <Card key={passive.id} className="bg-muted/50">
                   <CardHeader className="p-3">
-                    <CardTitle className="text-sm">{action.label}</CardTitle>
-                    <CardDescription className="text-xs">{action.description}</CardDescription>
+                    <CardTitle className="text-sm">{passive.label}</CardTitle>
+                    <CardDescription className="text-xs">{passive.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="p-3 pt-0 space-y-2">
-                    {action.cost && (
-                      <div className="text-xs text-muted-foreground">Cost: {formatResources(action.cost)}</div>
-                    )}
-                    {action.effect && Object.keys(action.effect).length > 0 && (
-                      <div className="text-xs text-muted-foreground">Effect: {formatResources(action.effect)}</div>
-                    )}
-                    {action.vpFlat && <div className="text-xs text-muted-foreground">VP: +{action.vpFlat}</div>}
-                    <Button size="sm" className="w-full" disabled={!canUse} onClick={() => gameStore.claimAction(action.id)}>
-                      {isClaimed ? "Used" : isCurrentTile ? "Use" : "Not Here"}
-                    </Button>
+                  <CardContent className="p-3 pt-0">
+                    <div className="text-xs space-y-1.5">
+                      <div className="text-muted-foreground">
+                        Trigger: Place a <span className="font-medium">{colorNames[passive.triggerColor]}</span> tile
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Reward:</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {formatResourcesWithIcons(passive.reward, false)}
+                          {passive.reward.vpFlat && (
+                            <div className="flex items-center gap-1">
+                              <Trophy className="w-3.5 h-3.5 text-orange-500" />
+                              <span>+{passive.reward.vpFlat} VP</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               )
@@ -145,12 +234,20 @@ export const TileDetailsPanel = observer(() => {
         {selectedTile.template.vpLogic && (
           <CardContent>
             <h4 className="font-medium text-sm mb-2">Victory Points</h4>
-            <div className="text-xs space-y-1">
-              {selectedTile.template.vpLogic.flat && <div>Flat: +{selectedTile.template.vpLogic.flat} VP</div>}
+            <div className="text-xs space-y-1.5">
+              {selectedTile.template.vpLogic.flat && (
+                <div className="flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-orange-500" />
+                  <span>Flat: +{selectedTile.template.vpLogic.flat} VP</span>
+                </div>
+              )}
               {selectedTile.template.vpLogic.perColorType &&
                 Object.entries(selectedTile.template.vpLogic.perColorType).map(([color, vp]) => (
-                  <div key={color}>
-                    +{vp} VP per {color} tile
+                  <div key={color} className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-orange-500" />
+                    <span>
+                      +{vp} VP per {color} tile
+                    </span>
                   </div>
                 ))}
             </div>
@@ -163,9 +260,53 @@ export const TileDetailsPanel = observer(() => {
 
 TileDetailsPanel.displayName = "TileDetailsPanel"
 
-function formatResources(resources: Record<string, number>): string {
+function formatResourcesWithIcons(resources: Record<string, number>, isCost: boolean = false): React.ReactNode[] {
+  const resourceConfig: Record<
+    string,
+    { icon: React.ReactNode; color: string; label: string }
+  > = {
+    energy: {
+      icon: <Zap className="w-7 h-7" />,
+      color: "text-yellow-500",
+      label: "Energy",
+    },
+    money: {
+      icon: <Coins className="w-7 h-7" />,
+      color: "text-green-500",
+      label: "Money",
+    },
+    materials: {
+      icon: <Hammer className="w-7 h-7" />,
+      color: "text-blue-500",
+      label: "Materials",
+    },
+    reputation: {
+      icon: <Users className="w-7 h-7" />,
+      color: "text-purple-500",
+      label: "Reputation",
+    },
+  }
+
   return Object.entries(resources)
     .filter(([_, value]) => value !== 0)
-    .map(([key, value]) => `${value > 0 ? "+" : ""}${value} ${key}`)
-    .join(", ")
+    .map(([key, value]) => {
+      const config = resourceConfig[key]
+      if (!config) return null
+
+      // For costs, always show as negative (spending)
+      // For effects, show positive with + sign (gaining)
+        const displayValue = isCost ? Math.abs(value) : value
+        const sign = isCost ? "-" : value > 0 ? "+" : ""
+
+        return (
+          <div key={key} className="flex items-center gap-2">
+            <span className={config.color}>{config.icon}</span>
+            <span className="text-base">
+              {sign}
+              {displayValue} {config.label}
+            </span>
+          </div>
+        )
+    })
+    .filter(Boolean) as React.ReactNode[]
 }

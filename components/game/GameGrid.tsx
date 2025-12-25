@@ -19,30 +19,34 @@ export const GameGrid = observer(() => {
   return (
     <div className="w-full h-full p-4 overflow-auto">
       <div
-        className="grid gap-2 mx-auto"
+        className="grid gap-3 mx-auto"
         style={{
           gridTemplateColumns: `repeat(${GRID_WIDTH}, minmax(0, 1fr))`,
-          maxWidth: `${GRID_WIDTH * 100}px`,
+          maxWidth: `${GRID_WIDTH * 150}px`,
         }}
       >
-        {state.grid.map((row, y) =>
-          row.map((tile, x) => {
-            const position = { x, y }
-            const isPlayerHere = state.playerPosition?.x === x && state.playerPosition?.y === y
-            const isSelected = state.selectedTilePosition?.x === x && state.selectedTilePosition?.y === y
+        {state.grid
+          .filter((_, y) => y >= 2) // Skip top 2 rows (y < 2)
+          .map((row, rowIndex) => {
+            const y = rowIndex + 2 // Adjust y index since we filtered
+            return row.map((tile, x) => {
+              const position = { x, y }
+              const isPlayerHere = state.playerPosition?.x === x && state.playerPosition?.y === y
+              const isSelected = state.selectedTilePosition?.x === x && state.selectedTilePosition?.y === y
 
-            return (
-              <GridCell
-                key={`${x}-${y}`}
-                tile={tile}
-                position={position}
-                isPlayerHere={isPlayerHere}
-                isSelected={isSelected}
-                onClick={() => gameStore.selectTile(position)}
-              />
-            )
-          }),
-        )}
+              return (
+                <GridCell
+                  key={`${x}-${y}`}
+                  tile={tile}
+                  position={position}
+                  isPlayerHere={isPlayerHere}
+                  isSelected={isSelected}
+                  onClick={() => gameStore.selectTile(position)}
+                />
+              )
+            })
+          })
+          .flat()}
       </div>
     </div>
   )

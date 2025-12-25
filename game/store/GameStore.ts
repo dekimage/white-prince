@@ -40,6 +40,7 @@ class GameStore {
       template: STARTER_TILE,
       rotation: 0,
       claimedActions: [],
+      actionUsage: {},
     }
 
     this.state = {
@@ -55,6 +56,10 @@ class GameStore {
       draftOptions: [],
       selectedTilePosition: startPos,
       gameStatus: "playing",
+      repeatableActionUsage: {},
+      passiveVP: 0,
+      focusMode: "grid",
+      focusedActionIndex: 0,
     }
 
     console.log("[v0] GameStore initialized with state:", this.state)
@@ -77,7 +82,9 @@ class GameStore {
 
   get victoryPoints(): number {
     if (!this.state || !this.state.grid || !this.state.resources) return 0
-    return calculateVictoryPoints(this.state.grid, this.state.resources)
+    const baseVP = calculateVictoryPoints(this.state.grid, this.state.resources)
+    const passiveVP = this.state.passiveVP || 0
+    return baseVP + passiveVP
   }
 
   get tilesPlaced(): number {
@@ -194,6 +201,7 @@ class GameStore {
       template,
       rotation,
       claimedActions: [],
+      actionUsage: {},
     }
 
     runInAction(() => {
@@ -204,8 +212,37 @@ class GameStore {
       delete this.state["_draftDirection"]
       delete this.state["_draftTargetPos"]
 
+      // Trigger passive abilities from all placed tiles
+      this.triggerPassiveAbilities(template.color)
+
       // Move player
       this.movePlayer(targetPos)
+    })
+  }
+
+  private triggerPassiveAbilities(placedColor: "orange" | "green" | "blue" | "purple") {
+    if (!this.state || !this.state.grid) return
+
+    // Check all placed tiles for passive abilities that match the placed color
+    this.state.grid.flat().forEach((tile) => {
+      if (!tile || !tile.template.passiveAbilities) return
+
+      tile.template.passiveAbilities.forEach((passive) => {
+        if (passive.triggerColor === placedColor) {
+          // Apply reward
+          if (passive.reward) {
+            this.gainResources(passive.reward)
+          }
+          // Track VP if any
+          if (passive.reward.vpFlat) {
+            if (!this.state.passiveVP) {
+              this.state.passiveVP = 0
+            }
+            this.state.passiveVP += passive.reward.vpFlat
+            console.log(`[Passive] ${tile.template.name} triggered: +${passive.reward.vpFlat} VP`)
+          }
+        }
+      })
     })
   }
 
@@ -217,12 +254,40 @@ class GameStore {
     // Move player
     this.state.playerPosition = pos
     this.state.selectedTilePosition = pos
+    this.state.focusMode = "grid" // Reset focus to grid after moving
 
     // Check loss conditions
     this.checkGameOver()
 
     // Save state
     this.save()
+  }
+
+  setFocusMode(mode: "grid" | "details") {
+    if (!this.state) return
+    this.state.focusMode = mode
+    if (mode === "details") {
+      this.state.focusedActionIndex = 0
+    }
+  }
+
+  setFocusedActionIndex(index: number) {
+    if (!this.state) return
+    const currentTile = this.currentTile
+    if (!currentTile || !currentTile.template.actions) return
+    const maxIndex = currentTile.template.actions.length - 1
+    this.state.focusedActionIndex = Math.max(0, Math.min(maxIndex, index))
+  }
+
+  useFocusedAction() {
+    if (!this.state) return
+    const currentTile = this.currentTile
+    if (!currentTile || !currentTile.template.actions) return
+    const actionIndex = this.state.focusedActionIndex || 0
+    const action = currentTile.template.actions[actionIndex]
+    if (action) {
+      this.claimAction(action.id)
+    }
   }
 
   moveToTile(targetPosition: Position): boolean {
@@ -275,28 +340,99 @@ class GameStore {
     const action = currentTile.template.actions?.find((a) => a.id === actionId)
     if (!action) return
 
-    // Check if already claimed
-    if (currentTile.claimedActions.includes(actionId)) return
+    // Check if repeatable action
+    if (action.maxUses) {
+      const usageKey = `${currentTile.template.id}-${actionId}`
+      const currentUsage = this.state.repeatableActionUsage?.[usageKey] || 0
+      
+      // Check if max uses reached
+      if (currentUsage >= action.maxUses) return
 
-    // Check costs
-    if (action.cost) {
-      if (!this.canAfford(action.cost)) return
-      this.spendResources(action.cost)
+      // Check costs
+      if (action.cost) {
+        if (!this.canAfford(action.cost)) return
+        this.spendResources(action.cost)
+      }
+
+      // Apply effects
+      if (action.effect) {
+        this.gainResources(action.effect)
+      }
+
+      // Increment usage
+      if (!this.state.repeatableActionUsage) {
+        this.state.repeatableActionUsage = {}
+      }
+      this.state.repeatableActionUsage[usageKey] = currentUsage + 1
+    } else {
+      // One-time action
+      // Check if already claimed
+      if (currentTile.claimedActions.includes(actionId)) return
+
+      // Check costs
+      if (action.cost) {
+        if (!this.canAfford(action.cost)) return
+        this.spendResources(action.cost)
+      }
+
+      // Apply effects
+      if (action.effect) {
+        this.gainResources(action.effect)
+      }
+
+      // Mark as claimed
+      currentTile.claimedActions.push(actionId)
     }
-
-    // Apply effects
-    if (action.effect) {
-      this.gainResources(action.effect)
-    }
-
-    // Mark as claimed
-    currentTile.claimedActions.push(actionId)
 
     // Check game over
     this.checkGameOver()
 
     // Save
     this.save()
+  }
+
+  getActionUsage(tile: PlacedTile, actionId: string): { current: number; max: number; isComplete: boolean } {
+    if (!this.state) return { current: 0, max: 1, isComplete: false }
+    
+    const action = tile.template.actions?.find((a) => a.id === actionId)
+    if (!action) return { current: 0, max: 1, isComplete: false }
+
+    if (action.maxUses) {
+      // Repeatable action
+      const usageKey = `${tile.template.id}-${actionId}`
+      const currentUsage = this.state.repeatableActionUsage?.[usageKey] || 0
+      return {
+        current: currentUsage,
+        max: action.maxUses,
+        isComplete: currentUsage >= action.maxUses,
+      }
+    } else {
+      // One-time action
+      const isClaimed = tile.claimedActions.includes(actionId)
+      return {
+        current: isClaimed ? 1 : 0,
+        max: 1,
+        isComplete: isClaimed,
+      }
+    }
+  }
+
+  isTileComplete(tile: PlacedTile): boolean {
+    if (!tile.template.actions || tile.template.actions.length === 0) return true
+    
+    return tile.template.actions.every((action) => {
+      const usage = this.getActionUsage(tile, action.id)
+      return usage.isComplete
+    })
+  }
+
+  hasUnusedActions(tile: PlacedTile): boolean {
+    if (!tile.template.actions || tile.template.actions.length === 0) return false
+    
+    return tile.template.actions.some((action) => {
+      const usage = this.getActionUsage(tile, action.id)
+      return !usage.isComplete
+    })
   }
 
   private canAfford(cost: ResourceCost): boolean {
@@ -306,6 +442,25 @@ class GameStore {
     if (cost.materials && this.state.resources.materials < cost.materials) return false
     if (cost.reputation && this.state.resources.reputation < cost.reputation) return false
     return true
+  }
+
+  getMissingResources(cost: ResourceCost): ResourceCost {
+    if (!this.state || !this.state.resources) return {}
+    
+    const missing: ResourceCost = {}
+    if (cost.energy && this.state.resources.energy < cost.energy) {
+      missing.energy = cost.energy - this.state.resources.energy
+    }
+    if (cost.money && this.state.resources.money < cost.money) {
+      missing.money = cost.money - this.state.resources.money
+    }
+    if (cost.materials && this.state.resources.materials < cost.materials) {
+      missing.materials = cost.materials - this.state.resources.materials
+    }
+    if (cost.reputation && this.state.resources.reputation < cost.reputation) {
+      missing.reputation = cost.reputation - this.state.resources.reputation
+    }
+    return missing
   }
 
   private spendResources(cost: ResourceCost) {
@@ -322,6 +477,10 @@ class GameStore {
     if (effect.money) this.state.resources.money += effect.money
     if (effect.materials) this.state.resources.materials += effect.materials
     if (effect.reputation) this.state.resources.reputation += effect.reputation
+  }
+
+  getPassiveAbilitiesForTile(tile: PlacedTile) {
+    return tile.template.passiveAbilities || []
   }
 
   private checkGameOver() {
@@ -363,6 +522,7 @@ class GameStore {
       template: STARTER_TILE,
       rotation: 0,
       claimedActions: [],
+      actionUsage: {},
     }
 
     runInAction(() => {
@@ -379,6 +539,10 @@ class GameStore {
         draftOptions: [],
         selectedTilePosition: startPos,
         gameStatus: "playing",
+        repeatableActionUsage: {},
+        passiveVP: 0,
+        focusMode: "grid",
+        focusedActionIndex: 0,
       }
     })
 

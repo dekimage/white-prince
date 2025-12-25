@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, Suspense } from "react"
+import React, { useEffect, useState, Suspense } from "react"
 import { observer } from "mobx-react-lite"
 import { useSearchParams, useRouter } from "next/navigation"
 import { gameStore } from "@/game/store/GameStore"
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Settings, Moon, Sun } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
 
 function GamePageContent() {
   const searchParams = useSearchParams()

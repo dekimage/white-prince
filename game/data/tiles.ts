@@ -1,9 +1,10 @@
-import type { TileTemplate } from "../types/game"
+import type { TileTemplate } from "../types/game";
 
 export const STARTER_TILE: TileTemplate = {
   id: "starter",
-  name: "Starting Room",
-  description: "Your journey begins here.",
+  name: "Neighbourhood HQ",
+  description:
+    "Your base for coordinating neighbourhood good. Every white-hat effort starts somewhere.",
   color: "starter",
   type: "starter",
   doors: { N: true, E: true, S: true, W: true },
@@ -11,19 +12,19 @@ export const STARTER_TILE: TileTemplate = {
   actions: [
     {
       id: "starter-energy",
-      label: "Rest",
-      description: "Recover your energy",
+      label: "Regroup",
+      description: "Take a breather and plan the next move.",
       effect: { energy: 5 },
     },
   ],
-}
+};
 
 export const TILE_DECK: TileTemplate[] = [
-  // ORANGE - Victory Points
+  // ORANGE - Victory Points / Impact
   {
     id: "vp-monument",
-    name: "Ancient Monument",
-    description: "A towering structure of historical significance.",
+    name: "Community Landmark",
+    description: "A symbol of collective effort and pride.",
     color: "orange",
     type: "vp",
     doors: { N: false, E: true, S: true, W: false },
@@ -32,8 +33,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "vp-gallery",
-    name: "Art Gallery",
-    description: "Beautiful paintings line the walls.",
+    name: "Neighbourhood Art Center",
+    description: "Supporting local artists and cultural expression.",
     color: "orange",
     type: "vp",
     doors: { N: true, E: false, S: true, W: true },
@@ -42,16 +43,16 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "gallery-culture",
-        label: "Admire Art",
-        description: "Gain reputation from culture",
+        label: "Support Local Artists",
+        description: "Gain reputation from cultural engagement",
         effect: { reputation: 3 },
       },
     ],
   },
   {
     id: "vp-library",
-    name: "Grand Library",
-    description: "Knowledge is power, and points.",
+    name: "Public Knowledge Hub",
+    description: "Access to information empowers everyone.",
     color: "orange",
     type: "vp",
     doors: { N: true, E: true, S: true, W: false },
@@ -60,8 +61,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "vp-temple",
-    name: "Sacred Temple",
-    description: "A place of worship and reflection.",
+    name: "Community Wellness Center",
+    description: "A place for mental health, balance, and reflection.",
     color: "orange",
     type: "vp",
     doors: { N: false, E: true, S: true, W: true },
@@ -70,8 +71,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "vp-garden",
-    name: "Royal Garden",
-    description: "Manicured hedges and exotic flowers.",
+    name: "Community Garden",
+    description: "Urban green space for recharging and connection.",
     color: "orange",
     type: "vp",
     doors: { N: true, E: false, S: true, W: true },
@@ -80,18 +81,18 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "garden-rest",
-        label: "Meditate",
-        description: "Find peace and energy",
+        label: "Recharge Outdoors",
+        description: "Find balance and restore energy",
         effect: { energy: 3 },
       },
     ],
   },
 
-  // GREEN - Economy (Money)
+  // GREEN - Economy / Funding
   {
     id: "economy-market",
-    name: "Bustling Market",
-    description: "Trade goods and earn coin.",
+    name: "Neighbourhood Market",
+    description: "Support local trade and community commerce.",
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: true, W: true },
@@ -99,16 +100,16 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "market-trade",
-        label: "Trade",
-        description: "Sell goods for money",
+        label: "Support Local Trade",
+        description: "Generate funding through community commerce",
         effect: { money: 8 },
       },
     ],
   },
   {
     id: "economy-bank",
-    name: "City Bank",
-    description: "Store and grow your wealth.",
+    name: "Community Credit Union",
+    description: "Ethical funding for local projects.",
     color: "green",
     type: "economy",
     doors: { N: false, E: true, S: true, W: true },
@@ -116,24 +117,24 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "bank-deposit",
-        label: "Invest",
-        description: "Invest money for VP",
+        label: "Fund Local Projects",
+        description: "Invest in community initiatives for long-term impact",
         cost: { money: 10 },
         effect: {},
         vpFlat: 8,
       },
       {
         id: "bank-loan",
-        label: "Take Loan",
-        description: "Borrow money",
+        label: "Micro-Grant",
+        description: "Secure funding for community work",
         effect: { money: 15 },
       },
     ],
   },
   {
     id: "economy-mine",
-    name: "Gold Mine",
-    description: "Extract precious resources.",
+    name: "Recycling & Resource Center",
+    description: "Urban recycling facility for sustainable resources.",
     color: "green",
     type: "economy",
     doors: { N: true, E: false, S: true, W: true },
@@ -141,8 +142,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "mine-extract",
-        label: "Mine Gold",
-        description: "Hard work for good pay",
+        label: "Process Materials",
+        description: "Manual work that generates funding through resale",
         cost: { energy: 2 },
         effect: { money: 12 },
       },
@@ -150,8 +151,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "economy-treasury",
-    name: "Royal Treasury",
-    description: "The kingdom's wealth.",
+    name: "City Grants Office",
+    description: "Municipal funding for community initiatives.",
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: true, W: false },
@@ -160,15 +161,15 @@ export const TILE_DECK: TileTemplate[] = [
       {
         id: "treasury-grant",
         label: "Request Grant",
-        description: "Receive royal funding",
+        description: "Secure public funding for neighbourhood projects",
         effect: { money: 20 },
       },
     ],
   },
   {
     id: "economy-tavern",
-    name: "Rowdy Tavern",
-    description: "Where coin flows freely.",
+    name: "Community Café",
+    description: "A hub for events and local connections.",
     color: "green",
     type: "economy",
     doors: { N: false, E: true, S: true, W: true },
@@ -176,18 +177,97 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "tavern-work",
-        label: "Serve Drinks",
-        description: "Earn tips",
+        label: "Run Events",
+        description: "Host community gatherings and receive donations",
         effect: { money: 6 },
       },
     ],
   },
+  {
+    id: "economy-partner",
+    name: "Community Partnership Hub",
+    description: "Build partnerships that reward community growth.",
+    color: "green",
+    type: "economy",
+    doors: { N: true, E: true, S: false, W: true },
+    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg",
+    actions: [
+      {
+        id: "partner-network",
+        label: "Build Network",
+        description: "Generate funding through partnerships",
+        effect: { money: 7 },
+      },
+    ],
+    passiveAbilities: [
+      {
+        id: "partner-purple",
+        label: "Social Growth Bonus",
+        description: "Each time you place a Purple tile, gain +1 Money",
+        triggerColor: "purple",
+        reward: { money: 1 },
+      },
+    ],
+  },
+  {
+    id: "economy-sponsor",
+    name: "Local Sponsor Network",
+    description: "Sponsors reward infrastructure development.",
+    color: "green",
+    type: "economy",
+    doors: { N: true, E: false, S: true, W: true },
+    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg",
+    actions: [
+      {
+        id: "sponsor-fund",
+        label: "Secure Sponsorship",
+        description: "Receive funding from local sponsors",
+        effect: { money: 9 },
+      },
+    ],
+    passiveAbilities: [
+      {
+        id: "sponsor-blue",
+        label: "Infrastructure Bonus",
+        description: "Each time you place a Blue tile, gain +1 Money",
+        triggerColor: "blue",
+        reward: { money: 1 },
+      },
+    ],
+  },
+  {
+    id: "economy-investor",
+    name: "Community Investment Fund",
+    description: "Investors reward impactful community projects.",
+    color: "green",
+    type: "economy",
+    doors: { N: false, E: true, S: true, W: true },
+    backgroundImageUrl: "/treasure-room-filled-with-gold-coins.jpg",
+    actions: [
+      {
+        id: "investor-donate",
+        label: "Request Investment",
+        description: "Secure funding from community investors",
+        effect: { money: 8 },
+      },
+    ],
+    passiveAbilities: [
+      {
+        id: "investor-orange",
+        label: "Impact Bonus",
+        description:
+          "Each time you place an Orange tile, gain +1 Money and +1 VP",
+        triggerColor: "orange",
+        reward: { money: 1, vpFlat: 1 },
+      },
+    ],
+  },
 
-  // BLUE - Build (Materials)
+  // BLUE - Build / Infrastructure
   {
     id: "build-quarry",
-    name: "Stone Quarry",
-    description: "Source of building materials.",
+    name: "Public Works Depot",
+    description: "Infrastructure and tools for community good.",
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: true, W: false },
@@ -195,16 +275,16 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "quarry-extract",
-        label: "Quarry Stone",
-        description: "Gather building materials",
+        label: "Gather Equipment",
+        description: "Acquire tools and infrastructure materials",
         effect: { materials: 5 },
       },
     ],
   },
   {
     id: "build-workshop",
-    name: "Craftsman Workshop",
-    description: "Turn materials into value.",
+    name: "Community Makerspace",
+    description: "Prototype solutions and create value.",
     color: "blue",
     type: "build",
     doors: { N: true, E: false, S: true, W: true },
@@ -212,8 +292,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "workshop-craft",
-        label: "Craft Items",
-        description: "Turn materials into money",
+        label: "Prototype Solutions",
+        description: "Turn infrastructure into funding",
         cost: { materials: 3 },
         effect: { money: 10 },
       },
@@ -221,8 +301,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "build-forge",
-    name: "Blacksmith Forge",
-    description: "Forge powerful tools.",
+    name: "Security Innovation Lab",
+    description: "Develop tools and solutions for community safety.",
     color: "blue",
     type: "build",
     doors: { N: false, E: true, S: true, W: true },
@@ -230,8 +310,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "forge-smelt",
-        label: "Forge Tools",
-        description: "Create valuable tools",
+        label: "Develop Solutions",
+        description: "Create valuable security tools",
         cost: { materials: 4 },
         effect: { money: 15 },
       },
@@ -239,8 +319,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "build-construction",
-    name: "Construction Site",
-    description: "Build for victory.",
+    name: "Neighbourhood Upgrade Project",
+    description: "Long-term infrastructure improvements for the community.",
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: true, W: true },
@@ -248,8 +328,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "construction-build",
-        label: "Build Monument",
-        description: "Use materials for VP",
+        label: "Complete Upgrade",
+        description: "Use infrastructure for lasting community impact",
         cost: { materials: 8, money: 5 },
         effect: {},
         vpFlat: 15,
@@ -258,8 +338,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "build-lumber",
-    name: "Lumber Mill",
-    description: "Process wood into materials.",
+    name: "Materials Processing Plant",
+    description: "Recycling and processing center for sustainable materials.",
     color: "blue",
     type: "build",
     doors: { N: true, E: false, S: true, W: true },
@@ -267,18 +347,79 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "lumber-process",
-        label: "Process Wood",
-        description: "Gain materials",
+        label: "Process Materials",
+        description: "Transform resources into usable infrastructure",
         effect: { materials: 6 },
       },
     ],
   },
+  {
+    id: "build-security",
+    name: "Community Security Hub",
+    description: "Protect the neighbourhood with ethical security measures.",
+    color: "blue",
+    type: "build",
+    doors: { N: true, E: true, S: false, W: true },
+    backgroundImageUrl: "/construction-site-with-scaffolding.jpg",
+    actions: [
+      {
+        id: "security-invest",
+        label: "Invest in Security",
+        description: "Pay funding to gain victory points (up to 3 times)",
+        cost: { money: 4 },
+        effect: {},
+        vpFlat: 2,
+        maxUses: 3,
+      },
+    ],
+  },
+  {
+    id: "build-infrastructure",
+    name: "Public Infrastructure Fund",
+    description: "Support community infrastructure improvements.",
+    color: "blue",
+    type: "build",
+    doors: { N: false, E: true, S: true, W: true },
+    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg",
+    actions: [
+      {
+        id: "infrastructure-contribute",
+        label: "Contribute to Infrastructure",
+        description: "Fund public works for victory points (up to 3 times)",
+        cost: { money: 4 },
+        effect: {},
+        vpFlat: 2,
+        maxUses: 3,
+      },
+    ],
+  },
+  {
+    id: "build-innovation",
+    name: "Innovation Grant Office",
+    description: "Support tech innovation for community benefit.",
+    color: "blue",
+    type: "build",
+    doors: { N: true, E: false, S: true, W: true },
+    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg",
+    actions: [
+      {
+        id: "innovation-grant",
+        label: "Fund Innovation",
+        description:
+          "Invest in community tech projects for victory points (up to 3 times)",
+        cost: { money: 4 },
+        effect: {},
+        vpFlat: 2,
+        maxUses: 3,
+      },
+    ],
+  },
 
-  // PURPLE - Social (Reputation)
+  // PURPLE - Social / Community
   {
     id: "social-plaza",
-    name: "Town Plaza",
-    description: "The heart of the community.",
+    name: "Community Square",
+    description: "The heart of the neighbourhood.",
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: true },
@@ -286,16 +427,16 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "plaza-speech",
-        label: "Give Speech",
-        description: "Gain reputation",
+        label: "Raise Awareness",
+        description: "Build community reputation through outreach",
         effect: { reputation: 4 },
       },
     ],
   },
   {
     id: "social-guild",
-    name: "Adventurer's Guild",
-    description: "Where heroes gather.",
+    name: "Volunteer Collective",
+    description: "Where community organizers gather.",
     color: "purple",
     type: "social",
     doors: { N: false, E: true, S: true, W: true },
@@ -303,8 +444,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "guild-quest",
-        label: "Complete Quest",
-        description: "Earn reputation",
+        label: "Coordinate Action",
+        description: "Organize volunteer efforts and build reputation",
         cost: { energy: 3 },
         effect: { reputation: 6 },
       },
@@ -312,8 +453,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "social-court",
-    name: "Royal Court",
-    description: "Impress the nobility.",
+    name: "City Council",
+    description: "Secure policy support for community initiatives.",
     color: "purple",
     type: "social",
     doors: { N: true, E: false, S: true, W: true },
@@ -321,8 +462,8 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "court-influence",
-        label: "Gain Favor",
-        description: "Use reputation for VP",
+        label: "Secure Policy Support",
+        description: "Convert community reputation into lasting impact",
         cost: { reputation: 5 },
         effect: {},
         vpFlat: 12,
@@ -331,8 +472,8 @@ export const TILE_DECK: TileTemplate[] = [
   },
   {
     id: "social-academy",
-    name: "Scholar's Academy",
-    description: "Knowledge brings respect.",
+    name: "Community Training Hub",
+    description: "Knowledge and skills empower the community.",
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: false },
@@ -340,16 +481,16 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "academy-teach",
-        label: "Teach",
-        description: "Gain reputation",
+        label: "Run Workshops",
+        description: "Share knowledge and build community reputation",
         effect: { reputation: 5 },
       },
     ],
   },
   {
     id: "social-festival",
-    name: "Festival Grounds",
-    description: "Celebrate with the people.",
+    name: "Community Event Space",
+    description: "Celebrate and connect with neighbours.",
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: true },
@@ -357,10 +498,10 @@ export const TILE_DECK: TileTemplate[] = [
     actions: [
       {
         id: "festival-perform",
-        label: "Perform",
-        description: "Entertain for reputation",
+        label: "Host Event",
+        description: "Build goodwill and receive community donations",
         effect: { reputation: 3, money: 4 },
       },
     ],
   },
-]
+];
