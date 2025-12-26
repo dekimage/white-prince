@@ -10,6 +10,7 @@ import {
   STARTING_ENERGY,
   WIN_VP_THRESHOLD,
   type ResourceCost,
+  type GameLogMessage,
 } from "../types/game"
 import { STARTER_TILE } from "../data/tiles"
 import { getAdjacentPosition, getDirectionBetween, isAdjacent } from "../engine/movement"
@@ -60,11 +61,14 @@ class GameStore {
       passiveVP: 0,
       questProgress: {},
       completedQuests: {},
+      messageLog: [],
       focusMode: "grid",
       focusedActionIndex: 0,
     }
 
     console.log("[v0] GameStore initialized with state:", this.state)
+    // Add initial log message
+    this.addLogMessage("Game started! Welcome to the neighbourhood.")
   }
 
   // Computed values
@@ -217,6 +221,9 @@ class GameStore {
       // Trigger passive abilities from all placed tiles
       this.triggerPassiveAbilities(template.color)
 
+      // Log tile draft
+      this.addLogMessage(`You drafted ${template.name}`)
+
       // Move player
       this.movePlayer(targetPos)
     })
@@ -243,6 +250,18 @@ class GameStore {
             this.state.passiveVP += passive.reward.vpFlat
             console.log(`[Passive] ${tile.template.name} triggered: +${passive.reward.vpFlat} VP`)
           }
+          
+          // Log passive ability trigger
+          const colorNames: Record<string, string> = {
+            orange: "Orange",
+            green: "Green",
+            blue: "Blue",
+            purple: "Purple",
+          }
+          this.addLogMessage(
+            `${tile.template.name} effect triggered! (placed ${colorNames[placedColor]} tile)`,
+            passive.reward
+          )
         }
       })
     })
@@ -250,6 +269,9 @@ class GameStore {
 
   private movePlayer(pos: Position) {
     if (!this.state || !this.state.resources) return
+    const currentTile = this.currentTile
+    const targetTile = this.state.grid?.[pos.y]?.[pos.x]
+    
     // Spend energy
     this.state.resources.energy -= 1
 
@@ -257,6 +279,13 @@ class GameStore {
     this.state.playerPosition = pos
     this.state.selectedTilePosition = pos
     this.state.focusMode = "grid" // Reset focus to grid after moving
+
+    // Log movement
+    if (targetTile) {
+      this.addLogMessage(`You moved to ${targetTile.template.name}`, { energy: -1 })
+    } else {
+      this.addLogMessage(`You moved to a new location`, { energy: -1 })
+    }
 
     // Check loss conditions
     this.checkGameOver()
@@ -384,26 +413,78 @@ class GameStore {
         this.state.repeatableActionUsage = {}
       }
       this.state.repeatableActionUsage[usageKey] = currentUsage + 1
+
+      // Log action usage
+      const resourceChanges: ResourceCost & { vpFlat?: number } = {}
+      // Add costs as negative values
+      if (action.cost) {
+        Object.keys(action.cost).forEach((key) => {
+          const costKey = key as keyof ResourceCost
+          if (action.cost![costKey]) {
+            resourceChanges[costKey] = -(action.cost![costKey] || 0)
+          }
+        })
+      }
+      // Add effects as positive values
+      if (action.effect) {
+        Object.keys(action.effect).forEach((key) => {
+          const effectKey = key as keyof ResourceCost
+          if (action.effect![effectKey]) {
+            resourceChanges[effectKey] = (resourceChanges[effectKey] || 0) + (action.effect![effectKey] || 0)
+          }
+        })
+      }
+      // Add VP if any
+      if (action.vpFlat) {
+        resourceChanges.vpFlat = action.vpFlat
+      }
+      this.addLogMessage(`You used ${action.label}`, resourceChanges)
     } else {
       // One-time action
     // Check if already claimed
     if (currentTile.claimedActions.includes(actionId)) return
 
-    // Check costs
-    if (action.cost) {
-      if (!this.canAfford(action.cost)) return
-      this.spendResources(action.cost)
+      // Check costs
+      if (action.cost) {
+        if (!this.canAfford(action.cost)) return
+        this.spendResources(action.cost)
         // Trigger quest progress for spending resources
         this.triggerQuestProgress(action.cost)
-    }
+      }
 
-    // Apply effects
-    if (action.effect) {
-      this.gainResources(action.effect)
-    }
+      // Apply effects
+      if (action.effect) {
+        this.gainResources(action.effect)
+      }
 
-    // Mark as claimed
-    currentTile.claimedActions.push(actionId)
+      // Mark as claimed
+      currentTile.claimedActions.push(actionId)
+
+      // Log action usage
+      const resourceChanges: ResourceCost & { vpFlat?: number } = {}
+      // Add costs as negative values
+      if (action.cost) {
+        Object.keys(action.cost).forEach((key) => {
+          const costKey = key as keyof ResourceCost
+          if (action.cost![costKey]) {
+            resourceChanges[costKey] = -(action.cost![costKey] || 0)
+          }
+        })
+      }
+      // Add effects as positive values
+      if (action.effect) {
+        Object.keys(action.effect).forEach((key) => {
+          const effectKey = key as keyof ResourceCost
+          if (action.effect![effectKey]) {
+            resourceChanges[effectKey] = (resourceChanges[effectKey] || 0) + (action.effect![effectKey] || 0)
+          }
+        })
+      }
+      // Add VP if any
+      if (action.vpFlat) {
+        resourceChanges.vpFlat = action.vpFlat
+      }
+      this.addLogMessage(`You used ${action.label}`, resourceChanges)
     }
 
     // Check game over
@@ -486,6 +567,12 @@ class GameStore {
       }
     }
 
+    // Log quest completion
+    this.addLogMessage(
+      `Quest completed: ${tile.template.name} - ${quest.label}`,
+      quest.reward
+    )
+
     console.log(`[Quest] ${tile.template.name} - ${quest.label} completed! Reward applied.`)
   }
 
@@ -501,6 +588,24 @@ class GameStore {
       current,
       max: quest.maxProgress,
       isComplete,
+    }
+  }
+
+  private addLogMessage(message: string, resourceChanges?: ResourceCost & { vpFlat?: number }) {
+    if (!this.state) return
+    if (!this.state.messageLog) {
+      this.state.messageLog = []
+    }
+    const logMessage: GameLogMessage = {
+      id: `log-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+      message,
+      resourceChanges,
+    }
+    this.state.messageLog.push(logMessage)
+    // Keep only last 100 messages to prevent memory issues
+    if (this.state.messageLog.length > 100) {
+      this.state.messageLog.shift()
     }
   }
 
@@ -656,12 +761,15 @@ class GameStore {
         passiveVP: 0,
         questProgress: {},
         completedQuests: {},
+        messageLog: [],
         focusMode: "grid",
         focusedActionIndex: 0,
       }
     })
 
     console.log("[v0] Game reset complete, new state:", this.state)
+    // Add initial log message
+    this.addLogMessage("Game started! Welcome to the neighbourhood.")
   }
 
   save() {

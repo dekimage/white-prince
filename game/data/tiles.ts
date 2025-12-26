@@ -87,6 +87,89 @@ export const TILE_DECK: TileTemplate[] = [
       },
     ],
   },
+  {
+    id: "vp-memorial",
+    name: "Community Memorial",
+    description: "Honoring those who contributed to the neighbourhood.",
+    color: "orange",
+    type: "vp",
+    doors: { N: true, E: true, S: false, W: true },
+    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg",
+    vpLogic: { flat: 14 },
+  },
+  {
+    id: "vp-safety",
+    name: "Public Safety Station",
+    description: "A symbol of community security and protection.",
+    color: "orange",
+    type: "vp",
+    doors: { N: false, E: true, S: true, W: true },
+    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg",
+    vpLogic: { flat: 11 },
+    actions: [
+      {
+        id: "safety-patrol",
+        label: "Community Watch",
+        description: "Organize neighbourhood watch and build trust",
+        effect: { reputation: 4 },
+      },
+    ],
+  },
+  {
+    id: "vp-library",
+    name: "Neighbourhood Learning Center",
+    description: "Knowledge sharing and educational empowerment.",
+    color: "orange",
+    type: "vp",
+    doors: { N: true, E: true, S: true, W: false },
+    backgroundImageUrl: "/grand-library-with-tall-bookshelves.jpg",
+    vpLogic: { flat: 9, perColorType: { purple: 2 } },
+    actions: [
+      {
+        id: "library-learn",
+        label: "Share Knowledge",
+        description: "Teach and learn from community members",
+        effect: { reputation: 3 },
+      },
+    ],
+  },
+  {
+    id: "vp-clinic",
+    name: "Community Health Clinic",
+    description: "Healthcare access for all neighbourhood residents.",
+    color: "orange",
+    type: "vp",
+    doors: { N: true, E: false, S: true, W: true },
+    backgroundImageUrl: "/sacred-temple-interior-with-candles.jpg",
+    vpLogic: { flat: 13 },
+    actions: [
+      {
+        id: "clinic-care",
+        label: "Provide Care",
+        description: "Offer health services and build community wellness",
+        cost: { energy: 2 },
+        effect: { reputation: 5 },
+      },
+    ],
+  },
+  {
+    id: "vp-youth",
+    name: "Youth Community Center",
+    description: "Empowering the next generation of community leaders.",
+    color: "orange",
+    type: "vp",
+    doors: { N: true, E: true, S: true, W: true },
+    backgroundImageUrl: "/art-gallery.png",
+    vpLogic: { flat: 12, perColorType: { green: 1 } },
+    actions: [
+      {
+        id: "youth-mentor",
+        label: "Mentor Youth",
+        description: "Guide and inspire young community members",
+        effect: { reputation: 4 },
+      },
+    ],
+  },
 
   // GREEN - Economy / Funding
   {
@@ -262,6 +345,40 @@ export const TILE_DECK: TileTemplate[] = [
       },
     ],
   },
+  {
+    id: "economy-fundraising",
+    name: "Community Fundraising Center",
+    description: "Organize campaigns to support neighbourhood initiatives.",
+    color: "green",
+    type: "economy",
+    doors: { N: true, E: true, S: false, W: true },
+    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg",
+    actions: [
+      {
+        id: "fundraising-campaign",
+        label: "Launch Campaign",
+        description: "Mobilize community support and raise funds",
+        effect: { money: 11 },
+      },
+    ],
+  },
+  {
+    id: "economy-alliance",
+    name: "Local Business Alliance",
+    description: "Partner with local businesses for mutual benefit.",
+    color: "green",
+    type: "economy",
+    doors: { N: true, E: false, S: true, W: true },
+    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg",
+    actions: [
+      {
+        id: "alliance-partner",
+        label: "Form Partnership",
+        description: "Create business partnerships that generate funding",
+        effect: { money: 10 },
+      },
+    ],
+  },
 
   // BLUE - Build / Infrastructure
   {
@@ -411,6 +528,41 @@ export const TILE_DECK: TileTemplate[] = [
         effect: {},
         vpFlat: 2,
         maxUses: 3,
+      },
+    ],
+  },
+  {
+    id: "build-tech-hub",
+    name: "Community Tech Hub",
+    description: "Technology infrastructure for digital empowerment.",
+    color: "blue",
+    type: "build",
+    doors: { N: true, E: true, S: true, W: false },
+    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg",
+    actions: [
+      {
+        id: "tech-hub-setup",
+        label: "Install Infrastructure",
+        description: "Set up technology infrastructure for the community",
+        effect: { materials: 7 },
+      },
+    ],
+  },
+  {
+    id: "build-maintenance",
+    name: "Neighbourhood Maintenance Center",
+    description: "Keep community infrastructure in excellent condition.",
+    color: "blue",
+    type: "build",
+    doors: { N: false, E: true, S: true, W: true },
+    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg",
+    actions: [
+      {
+        id: "maintenance-repair",
+        label: "Maintain Infrastructure",
+        description: "Repair and maintain community facilities",
+        cost: { energy: 2 },
+        effect: { materials: 5 },
       },
     ],
   },

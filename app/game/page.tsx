@@ -6,10 +6,12 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { gameStore } from "@/game/store/GameStore"
 import { GameGrid } from "@/components/game/GameGrid"
 import { TileDetailsPanel } from "@/components/game/TileDetailsPanel"
+import { MessageLog } from "@/components/game/MessageLog"
 import { ResourceBar } from "@/components/game/ResourceBar"
 import { DraftModal } from "@/components/game/DraftModal"
 import { GameOverModal } from "@/components/game/GameOverModal"
 import { KeyboardControls } from "@/components/game/KeyboardControls"
+import { ViewAllTilesModal } from "@/components/game/ViewAllTilesModal"
 import { Button } from "@/components/ui/button"
 import { Settings, Moon, Sun } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -22,6 +24,7 @@ function GamePageContent() {
   const [isInitialized, setIsInitialized] = React.useState(false)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [showAllTiles, setShowAllTiles] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -89,6 +92,7 @@ function GamePageContent() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowAllTiles(true)}>View All Tiles</DropdownMenuItem>
               <DropdownMenuItem onClick={handleReset}>Reset Game</DropdownMenuItem>
               <DropdownMenuItem onClick={handleHome}>Home</DropdownMenuItem>
             </DropdownMenuContent>
@@ -99,6 +103,11 @@ function GamePageContent() {
 
       {/* Main game area */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Message log */}
+        <div className="w-80 border-r bg-card overflow-hidden">
+          <MessageLog />
+        </div>
+
         {/* Grid */}
         <div className="flex-1 overflow-auto">
           <GameGrid />
@@ -113,6 +122,7 @@ function GamePageContent() {
       {/* Modals */}
       <DraftModal />
       <GameOverModal />
+      <ViewAllTilesModal isOpen={showAllTiles} onClose={() => setShowAllTiles(false)} />
       <KeyboardControls />
 
       {/* Controls hint */}

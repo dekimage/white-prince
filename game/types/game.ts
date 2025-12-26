@@ -90,6 +90,13 @@ export interface GameResources {
   reputation: number;
 }
 
+export interface GameLogMessage {
+  id: string;
+  timestamp: number;
+  message: string;
+  resourceChanges?: ResourceCost & { vpFlat?: number }; // Resource changes associated with this message
+}
+
 export interface GameState {
   grid: (PlacedTile | null)[][];
   playerPosition: Position;
@@ -103,6 +110,7 @@ export interface GameState {
   passiveVP?: number; // Track VP earned from passive abilities
   questProgress?: Record<string, number>; // Track quest progress: "tileId-questId" -> current progress
   completedQuests?: Record<string, boolean>; // Track completed quests: "tileId-questId" -> true
+  messageLog?: GameLogMessage[]; // Game event log
   focusMode?: "grid" | "details"; // Focus mode: grid or details panel
   focusedActionIndex?: number; // Index of focused action in details panel
 }
