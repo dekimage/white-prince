@@ -17,6 +17,7 @@ export interface ResourceCost {
   materials?: number;
   reputation?: number;
   energy?: number;
+  whitehats?: number;
 }
 
 export interface TileAction {
@@ -69,6 +70,7 @@ export interface TileTemplate {
   doors: Doors;
   backgroundImageUrl: string;
   placementCost?: ResourceCost;
+  draftingCost: number; // Cost in whitehats to draft this tile (1, 2, or 3)
   actions?: TileAction[];
   passiveAbilities?: PassiveAbility[]; // Passive abilities that trigger when placing tiles of specific colors
   quest?: Quest; // Quest that tracks progress and gives rewards
@@ -88,6 +90,7 @@ export interface GameResources {
   money: number;
   materials: number;
   reputation: number;
+  whitehats: number;
 }
 
 export interface GameLogMessage {
@@ -103,6 +106,7 @@ export interface GameState {
   resources: GameResources;
   isDrafting: boolean;
   draftOptions: TileTemplate[];
+  draftRerollCount?: number; // Number of times rerolled in current draft (0-3)
   selectedTilePosition: Position | null;
   gameStatus: "playing" | "won" | "lost";
   lossReason?: string;
@@ -118,4 +122,5 @@ export interface GameState {
 export const GRID_WIDTH = 5;
 export const GRID_HEIGHT = 8;
 export const STARTING_ENERGY = 50;
+export const STARTING_WHITEHATS = 50;
 export const WIN_VP_THRESHOLD = 100;

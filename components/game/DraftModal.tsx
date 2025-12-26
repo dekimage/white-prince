@@ -5,21 +5,23 @@ import { observer } from "mobx-react-lite"
 import { gameStore } from "@/game/store/GameStore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Zap, Coins, Hammer, Users, Trophy, X, Eye, EyeOff } from "lucide-react"
+import { Zap, Coins, Hammer, Users, Trophy, X, Eye, EyeOff, GraduationCap } from "lucide-react"
 import type { ResourceCost } from "@/game/types/game"
 import { getDoorAfterRotation } from "@/game/engine/rotation"
 import { calculateRotation } from "@/game/engine/rotation"
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react"
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ArrowUp, Dice1 } from "lucide-react"
 
 export const DraftModal = observer(() => {
   const { state } = gameStore
   const [isHidden, setIsHidden] = useState(false)
   const [selectedCardIndex, setSelectedCardIndex] = useState(1) // Default to center card
+  const [focusOnReroll, setFocusOnReroll] = useState(false) // Track if reroll button is focused
 
   // Reset to center when draft options change
   React.useEffect(() => {
     if (state?.draftOptions) {
       setSelectedCardIndex(1)
+      setFocusOnReroll(false)
     }
   }, [state?.draftOptions])
 
@@ -41,16 +43,35 @@ export const DraftModal = observer(() => {
       switch (e.key) {
         case "ArrowLeft":
           e.preventDefault()
-          setSelectedCardIndex((prev) => Math.max(0, prev - 1))
+          if (!focusOnReroll) {
+            setSelectedCardIndex((prev) => Math.max(0, prev - 1))
+          }
           break
         case "ArrowRight":
           e.preventDefault()
-          setSelectedCardIndex((prev) => Math.min((state.draftOptions?.length || 3) - 1, prev + 1))
+          if (!focusOnReroll) {
+            setSelectedCardIndex((prev) => Math.min((state.draftOptions?.length || 3) - 1, prev + 1))
+          }
+          break
+        case "ArrowDown":
+          e.preventDefault()
+          if (!focusOnReroll) {
+            setFocusOnReroll(true)
+          }
+          break
+        case "ArrowUp":
+          e.preventDefault()
+          if (focusOnReroll) {
+            setFocusOnReroll(false)
+            setSelectedCardIndex(1) // Return to center card
+          }
           break
         case "Enter":
         case " ":
           e.preventDefault()
-          if (state.draftOptions?.[selectedCardIndex]) {
+          if (focusOnReroll) {
+            gameStore.rerollDraft()
+          } else if (state.draftOptions?.[selectedCardIndex]) {
             gameStore.selectDraftTile(state.draftOptions[selectedCardIndex])
           }
           break
@@ -59,7 +80,7 @@ export const DraftModal = observer(() => {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [state?.isDrafting, isHidden, selectedCardIndex, state?.draftOptions])
+  }, [state?.isDrafting, isHidden, selectedCardIndex, state?.draftOptions, focusOnReroll])
 
   if (!state || !state.isDrafting) return null
 
@@ -95,6 +116,11 @@ export const DraftModal = observer(() => {
         icon: <Users className="w-4 h-4" />,
         color: "text-purple-500",
         label: "Reputation",
+      },
+      whitehats: {
+        icon: <GraduationCap className="w-4 h-4" />,
+        color: "text-white",
+        label: "Whitehats",
       },
     }
 
@@ -170,8 +196,8 @@ export const DraftModal = observer(() => {
 
           {/* Cards Container */}
           {!isHidden && (
-            <div className="flex-1 overflow-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 h-full items-center justify-items-center">
+            <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+              <div className="flex items-center justify-center gap-6 lg:gap-8 flex-wrap">
                 {state.draftOptions.map((tile, index) => {
                   const rotation = getPreviewRotation(tile)
                   const doors = {
@@ -182,13 +208,15 @@ export const DraftModal = observer(() => {
                   }
                   const isSelected = selectedCardIndex === index
 
+                  const canAfford = state.resources.whitehats >= tile.draftingCost
+                  
                   return (
-                    <div key={`${tile.id}-${index}`} className="relative w-full max-w-sm">
+                    <div key={`${tile.id}-${index}`} className="relative w-[350px] min-w-[280px] flex-shrink">
                       <Card
-                        className={`cursor-pointer hover:scale-105 transition-all border-4 ${borderColorClasses[tile.color]} w-full flex flex-col h-[600px] ${
+                        className={`${canAfford ? "cursor-pointer hover:scale-105" : "cursor-not-allowed opacity-50"} transition-all border-4 ${borderColorClasses[tile.color]} w-full flex flex-col h-[600px] ${
                           isSelected ? "ring-4 ring-primary ring-offset-2" : ""
                         }`}
-                        onClick={() => gameStore.selectDraftTile(tile)}
+                        onClick={() => canAfford && gameStore.selectDraftTile(tile)}
             >
               <div className="relative w-full h-48 rounded-t-lg overflow-hidden flex-shrink-0">
                 <img
@@ -198,6 +226,12 @@ export const DraftModal = observer(() => {
                 />
                         {/* Black overlay with 20% opacity */}
                         <div className="absolute inset-0 bg-black/20" />
+                        
+                        {/* Drafting cost in top-left */}
+                        <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/70 rounded-md px-2 py-1">
+                          <span className="text-2xl font-bold text-white">{tile.draftingCost}</span>
+                          <GraduationCap className="w-6 h-6 text-white" />
+                        </div>
                         
                         {/* Door indicators */}
                         {doors.N && (
@@ -354,6 +388,34 @@ export const DraftModal = observer(() => {
                   </div>
                   )
                 })}
+              </div>
+              
+              {/* Reroll Button */}
+              <div className="flex justify-center mt-4">
+                {(() => {
+                  const rerollCount = state.draftRerollCount || 0
+                  const rerollCost = rerollCount + 1
+                  const canReroll = rerollCount < 3 && state.resources.energy >= rerollCost
+                  const isRerollFocused = focusOnReroll
+                  
+                  return (
+                    <Button
+                      className={`${isRerollFocused ? "ring-4 ring-primary ring-offset-2" : ""}`}
+                      variant={canReroll ? "default" : "outline"}
+                      disabled={!canReroll}
+                      onClick={() => gameStore.rerollDraft()}
+                      ref={(el) => {
+                        if (isRerollFocused && el) {
+                          el.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                        }
+                      }}
+                    >
+                      <Dice1 className="w-4 h-4 mr-2" />
+                      Reroll ({rerollCost})
+                      {rerollCount >= 3 && <span className="ml-2 text-xs">(Max reached)</span>}
+                    </Button>
+                  )
+                })()}
               </div>
             </div>
           )}

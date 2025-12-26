@@ -28,6 +28,11 @@ export const ViewAllTilesModal: React.FC<ViewAllTilesModalProps> = ({
     ? allTiles.filter((tile) => tile.color === selectedColor)
     : allTiles;
 
+  // Sort by drafting cost (ascending)
+  const sortedTiles = [...filteredTiles].sort(
+    (a, b) => a.draftingCost - b.draftingCost
+  );
+
   // Get unique colors
   const colors = Array.from(new Set(allTiles.map((tile) => tile.color)));
 
@@ -66,7 +71,7 @@ export const ViewAllTilesModal: React.FC<ViewAllTilesModalProps> = ({
       {/* Tiles Grid */}
       <div className="flex-1 overflow-auto p-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-w-[1800px] mx-auto">
-          {filteredTiles.map((tile) => (
+          {sortedTiles.map((tile) => (
             <div key={tile.id} className="w-full" style={{ height: "300px" }}>
               <TileCard tile={tile} scale={0.5} showDoors={true} />
             </div>

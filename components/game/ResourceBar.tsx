@@ -4,7 +4,7 @@ import type React from "react"
 
 import { observer } from "mobx-react-lite"
 import { gameStore } from "@/game/store/GameStore"
-import { Zap, Coins, Hammer, Users, Trophy } from "lucide-react"
+import { Zap, Coins, Hammer, Users, Trophy, GraduationCap } from "lucide-react"
 
 export const ResourceBar = observer(() => {
   const { state, victoryPoints, tilesPlaced } = gameStore
@@ -38,6 +38,12 @@ export const ResourceBar = observer(() => {
         label="Reputation"
         value={state.resources.reputation}
         color="text-purple-500"
+      />
+      <ResourceItem
+        icon={<GraduationCap className="w-6 h-6" />}
+        label="Whitehats"
+        value={state.resources.whitehats}
+        color="text-white"
       />
       <div className="h-6 w-px bg-border" />
       <ResourceItem

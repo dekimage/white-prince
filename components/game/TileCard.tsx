@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  GraduationCap,
 } from "lucide-react";
 import type { TileTemplate, ResourceCost } from "@/game/types/game";
 import { getDoorAfterRotation } from "@/game/engine/rotation";
@@ -66,6 +67,11 @@ export const TileCard: React.FC<TileCardProps> = ({
         icon: <Users className="w-4 h-4" />,
         color: "text-purple-500",
         label: "Reputation",
+      },
+      whitehats: {
+        icon: <GraduationCap className="w-4 h-4" />,
+        color: "text-white",
+        label: "Whitehats",
       },
     };
 
@@ -128,6 +134,22 @@ export const TileCard: React.FC<TileCardProps> = ({
         />
         {/* Black overlay with 20% opacity */}
         <div className="absolute inset-0 bg-black/20" />
+
+        {/* Drafting cost in top-left */}
+        {tile.draftingCost > 0 && (
+          <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/70 rounded-md px-2 py-1">
+            <span
+              className={`${
+                scale === 0.5 ? "text-lg" : "text-2xl"
+              } font-bold text-white`}
+            >
+              {tile.draftingCost}
+            </span>
+            <GraduationCap
+              className={`${scale === 0.5 ? "w-4 h-4" : "w-6 h-6"} text-white`}
+            />
+          </div>
+        )}
 
         {/* Door indicators */}
         {doors.N && (

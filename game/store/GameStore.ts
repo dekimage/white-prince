@@ -8,6 +8,7 @@ import {
   GRID_WIDTH,
   GRID_HEIGHT,
   STARTING_ENERGY,
+  STARTING_WHITEHATS,
   WIN_VP_THRESHOLD,
   type ResourceCost,
   type GameLogMessage,
@@ -49,9 +50,10 @@ class GameStore {
       playerPosition: startPos,
       resources: {
         energy: STARTING_ENERGY,
-        money: 0,
-        materials: 0,
-        reputation: 0,
+        money: 10,
+        materials: 5,
+        reputation: 3,
+        whitehats: STARTING_WHITEHATS,
       },
       isDrafting: false,
       draftOptions: [],
@@ -135,6 +137,9 @@ class GameStore {
     const targetPos = getAdjacentPosition(this.state.playerPosition, direction)
     if (!targetPos) return // Out of bounds
 
+    // Prevent movement to top 2 rows (y < 2) which are not visible
+    if (targetPos.y < 2) return
+
     if (!this.state.grid[targetPos.y]) return
     const targetTile = this.state.grid[targetPos.y][targetPos.x]
 
@@ -182,17 +187,83 @@ class GameStore {
   private startDraft(direction: Direction, targetPos: Position) {
     if (!this.state) return
     const options = getRandomTiles(3)
+    
+    // Check if any tile can be drafted
+    const canDraftAny = options.some((tile) => this.state.resources.whitehats >= tile.draftingCost)
+    
+    if (!canDraftAny) {
+      // Game over - no tiles can be drafted
+      const finalVP = this.victoryPoints
+      runInAction(() => {
+        this.state.gameStatus = "lost"
+        this.state.lossReason = `Not enough whitehats to draft any available tiles. Final Score: ${finalVP} Victory Points`
+      })
+      return
+    }
+    
     runInAction(() => {
       this.state.isDrafting = true
       this.state.draftOptions = options
+      this.state.draftRerollCount = 0 // Reset reroll count for new draft
       this.state["_draftDirection"] = direction
       this.state["_draftTargetPos"] = targetPos
     })
   }
 
+  rerollDraft() {
+    if (!this.state || !this.state.isDrafting) return
+    
+    const rerollCount = this.state.draftRerollCount || 0
+    
+    // Check max rerolls (3 times max)
+    if (rerollCount >= 3) {
+      this.addLogMessage("Maximum rerolls reached (3 per draft)")
+      return
+    }
+    
+    // Calculate cost (1st = 1, 2nd = 2, 3rd = 3)
+    const cost = rerollCount + 1
+    
+    // Check if player can afford
+    if (this.state.resources.energy < cost) {
+      this.addLogMessage(`Not enough energy to reroll (need ${cost})`)
+      return
+    }
+    
+    // Get new random tiles
+    const newOptions = getRandomTiles(3)
+    
+    // Check if any tile can be drafted
+    const canDraftAny = newOptions.some((tile) => this.state.resources.whitehats >= tile.draftingCost)
+    
+    if (!canDraftAny) {
+      // Game over - no tiles can be drafted
+      const finalVP = this.victoryPoints
+      runInAction(() => {
+        this.state.gameStatus = "lost"
+        this.state.lossReason = `Not enough whitehats to draft any available tiles. Final Score: ${finalVP} Victory Points`
+      })
+      return
+    }
+    
+    // Deduct energy and update draft options
+    runInAction(() => {
+      this.state.resources.energy -= cost
+      this.state.draftOptions = newOptions
+      this.state.draftRerollCount = rerollCount + 1
+    })
+    
+    this.addLogMessage(`Rerolled draft options (${cost} Energy)`, { energy: -cost })
+  }
+
   selectDraftTile(template: TileTemplate) {
     if (!this.state || !this.state.grid) return
     if (!this.state.isDrafting) return
+
+    // Check if we have enough whitehats
+    if (this.state.resources.whitehats < template.draftingCost) {
+      return
+    }
 
     const direction = this.state["_draftDirection"] as Direction
     const targetPos = this.state["_draftTargetPos"] as Position
@@ -212,6 +283,10 @@ class GameStore {
 
     runInAction(() => {
       if (!this.state || !this.state.grid || !this.state.grid[targetPos.y]) return
+      
+      // Spend whitehats
+      this.state.resources.whitehats -= template.draftingCost
+      
       this.state.grid[targetPos.y][targetPos.x] = newTile
       this.state.isDrafting = false
       this.state.draftOptions = []
@@ -222,7 +297,7 @@ class GameStore {
       this.triggerPassiveAbilities(template.color)
 
       // Log tile draft
-      this.addLogMessage(`You drafted ${template.name}`)
+      this.addLogMessage(`You drafted ${template.name}`, { whitehats: -template.draftingCost })
 
       // Move player
       this.movePlayer(targetPos)
@@ -659,6 +734,7 @@ class GameStore {
     if (cost.money && this.state.resources.money < cost.money) return false
     if (cost.materials && this.state.resources.materials < cost.materials) return false
     if (cost.reputation && this.state.resources.reputation < cost.reputation) return false
+    if (cost.whitehats && this.state.resources.whitehats < cost.whitehats) return false
     return true
   }
 
@@ -678,6 +754,9 @@ class GameStore {
     if (cost.reputation && this.state.resources.reputation < cost.reputation) {
       missing.reputation = cost.reputation - this.state.resources.reputation
     }
+    if (cost.whitehats && this.state.resources.whitehats < cost.whitehats) {
+      missing.whitehats = cost.whitehats - this.state.resources.whitehats
+    }
     return missing
   }
 
@@ -687,6 +766,7 @@ class GameStore {
     if (cost.money) this.state.resources.money -= cost.money
     if (cost.materials) this.state.resources.materials -= cost.materials
     if (cost.reputation) this.state.resources.reputation -= cost.reputation
+    if (cost.whitehats) this.state.resources.whitehats -= cost.whitehats
   }
 
   private gainResources(effect: ResourceCost) {
@@ -695,6 +775,7 @@ class GameStore {
     if (effect.money) this.state.resources.money += effect.money
     if (effect.materials) this.state.resources.materials += effect.materials
     if (effect.reputation) this.state.resources.reputation += effect.reputation
+    if (effect.whitehats) this.state.resources.whitehats += effect.whitehats
   }
 
   getPassiveAbilitiesForTile(tile: PlacedTile) {
@@ -747,12 +828,13 @@ class GameStore {
       this.state = {
         grid: emptyGrid,
         playerPosition: startPos,
-        resources: {
-          energy: STARTING_ENERGY,
-          money: 0,
-          materials: 0,
-          reputation: 0,
-        },
+      resources: {
+        energy: STARTING_ENERGY,
+        money: 10,
+        materials: 5,
+        reputation: 3,
+        whitehats: STARTING_WHITEHATS,
+      },
         isDrafting: false,
         draftOptions: [],
         selectedTilePosition: startPos,

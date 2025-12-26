@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { isAdjacent, getDirectionBetween } from "@/game/engine/movement"
 import { getDoorAfterRotation } from "@/game/engine/rotation"
-import { Move, Zap, Coins, Hammer, Users, Trophy } from "lucide-react"
+import { Move, Zap, Coins, Hammer, Users, Trophy, GraduationCap } from "lucide-react"
 import type { Direction } from "@/game/types/game"
 
 export const TileDetailsPanel = observer(() => {
@@ -328,6 +328,11 @@ function formatResourcesWithIcons(resources: Record<string, number>, isCost: boo
       icon: <Users className="w-7 h-7" />,
       color: "text-purple-500",
       label: "Reputation",
+    },
+    whitehats: {
+      icon: <GraduationCap className="w-7 h-7" />,
+      color: "text-white",
+      label: "Whitehats",
     },
   }
 

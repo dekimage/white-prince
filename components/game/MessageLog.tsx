@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff,
   Filter,
+  GraduationCap,
 } from "lucide-react";
 import type { ResourceCost } from "@/game/types/game";
 
@@ -61,6 +62,11 @@ export const MessageLog = observer(() => {
         icon: <Users className="w-4 h-4" />,
         color: "text-purple-500",
         label: "Reputation",
+      },
+      whitehats: {
+        icon: <GraduationCap className="w-4 h-4" />,
+        color: "text-white",
+        label: "Whitehats",
       },
     };
 
