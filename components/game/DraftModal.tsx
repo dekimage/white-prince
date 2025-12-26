@@ -77,22 +77,22 @@ export const DraftModal = observer(() => {
       { icon: React.ReactNode; color: string; label: string }
     > = {
       energy: {
-        icon: <Zap className="w-7 h-7" />,
+        icon: <Zap className="w-4 h-4" />,
         color: "text-yellow-500",
         label: "Energy",
       },
       money: {
-        icon: <Coins className="w-7 h-7" />,
+        icon: <Coins className="w-4 h-4" />,
         color: "text-green-500",
         label: "Money",
       },
       materials: {
-        icon: <Hammer className="w-7 h-7" />,
+        icon: <Hammer className="w-4 h-4" />,
         color: "text-blue-500",
         label: "Materials",
       },
       reputation: {
-        icon: <Users className="w-7 h-7" />,
+        icon: <Users className="w-4 h-4" />,
         color: "text-purple-500",
         label: "Reputation",
       },
@@ -108,9 +108,9 @@ export const DraftModal = observer(() => {
         const sign = isCost ? "-" : value > 0 ? "+" : ""
 
         return (
-          <div key={key} className="flex items-center gap-2">
+          <div key={key} className="flex items-center gap-1.5">
             <span className={config.color}>{config.icon}</span>
-            <span className="text-base">
+            <span className="text-xs">
               {sign}
               {displayValue} {config.label}
             </span>
@@ -185,16 +185,17 @@ export const DraftModal = observer(() => {
                   return (
                     <div key={`${tile.id}-${index}`} className="relative w-full max-w-sm">
                       <Card
-                        className={`cursor-pointer hover:scale-105 transition-all border-4 ${borderColorClasses[tile.color]} w-full flex flex-col h-fit ${
+                        className={`cursor-pointer hover:scale-105 transition-all border-4 ${borderColorClasses[tile.color]} w-full flex flex-col h-[600px] ${
                           isSelected ? "ring-4 ring-primary ring-offset-2" : ""
                         }`}
                         onClick={() => gameStore.selectDraftTile(tile)}
-                      >
-                      <div className="relative w-full aspect-square rounded-t-lg overflow-hidden">
-                        <div
-                          className="absolute inset-0 bg-cover bg-center"
-                          style={{ backgroundImage: `url(${tile.backgroundImageUrl})` }}
-                        />
+            >
+              <div className="relative w-full h-48 rounded-t-lg overflow-hidden flex-shrink-0">
+                <img
+                  src={tile.backgroundImageUrl}
+                  alt={tile.name}
+                  className="w-full h-full object-cover"
+                />
                         {/* Black overlay with 20% opacity */}
                         <div className="absolute inset-0 bg-black/20" />
                         
@@ -219,11 +220,11 @@ export const DraftModal = observer(() => {
                             <ChevronLeft className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
                           </div>
                         )}
-                      </div>
-              <CardHeader className="pb-2">
+              </div>
+              <CardHeader className="pb-2 flex-shrink-0">
                 <CardTitle className="text-sm font-medium">{tile.name}</CardTitle>
               </CardHeader>
-              <CardContent className="pt-0 space-y-3">
+              <CardContent className="pt-0 space-y-3 flex-1 overflow-y-auto">
                 {/* Actions */}
                 {tile.actions && tile.actions.length > 0 && (
                   <div className="space-y-2">
@@ -261,8 +262,8 @@ export const DraftModal = observer(() => {
 
                 {/* Passive Abilities */}
                 {tile.passiveAbilities && tile.passiveAbilities.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-base font-semibold text-muted-foreground">Passive:</h4>
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-muted-foreground">Passive:</h4>
                     {tile.passiveAbilities.map((passive) => {
                       const colorNames: Record<string, string> = {
                         orange: "Orange",
@@ -271,17 +272,17 @@ export const DraftModal = observer(() => {
                         purple: "Purple",
                       }
                       return (
-                        <div key={passive.id} className="text-base space-y-2">
+                        <div key={passive.id} className="text-xs space-y-1">
                           <div className="font-medium">{passive.label}</div>
                           <div className="text-muted-foreground">
                             When placing {colorNames[passive.triggerColor]} tile:
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap">
+                          <div className="flex items-center gap-1.5 flex-wrap text-xs">
                             {formatResourcesWithIcons(passive.reward, false)}
                             {passive.reward.vpFlat && (
-                              <div className="flex items-center gap-2">
-                                <Trophy className="w-6 h-6 text-orange-500" />
-                                <span className="text-base">+{passive.reward.vpFlat} VP</span>
+                              <div className="flex items-center gap-1.5 text-xs">
+                                <Trophy className="w-3 h-3 text-orange-500" />
+                                <span>+{passive.reward.vpFlat} VP</span>
                               </div>
                             )}
                           </div>
@@ -294,18 +295,18 @@ export const DraftModal = observer(() => {
                 {/* VP Logic */}
                 {tile.vpLogic && (
                   <div className="space-y-2">
-                    <h4 className="text-base font-semibold text-muted-foreground">Victory Points:</h4>
-                    <div className="text-base space-y-1">
+                    <h4 className="text-xs font-semibold text-muted-foreground">Victory Points:</h4>
+                    <div className="text-xs space-y-1">
                       {tile.vpLogic.flat && (
-                        <div className="flex items-center gap-2">
-                          <Trophy className="w-6 h-6 text-orange-500" />
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <Trophy className="w-3 h-3 text-orange-500" />
                           <span>+{tile.vpLogic.flat} VP</span>
                         </div>
                       )}
                       {tile.vpLogic.perColorType &&
                         Object.entries(tile.vpLogic.perColorType).map(([color, vp]) => (
-                          <div key={color} className="flex items-center gap-2">
-                            <Trophy className="w-6 h-6 text-orange-500" />
+                          <div key={color} className="flex items-center gap-1.5 text-xs">
+                            <Trophy className="w-3 h-3 text-orange-500" />
                             <span>
                               +{vp} VP per {color} tile
                             </span>
@@ -315,9 +316,32 @@ export const DraftModal = observer(() => {
                   </div>
                 )}
 
-                      <Button className="w-full mt-4" size="sm">
-                        Select
-                      </Button>
+                {/* Quest */}
+                {tile.quest && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-muted-foreground">Quest:</h4>
+                    <div className="text-xs space-y-1">
+                      <div className="font-medium">{tile.quest.label}</div>
+                      <div className="text-muted-foreground">{tile.quest.description}</div>
+                      {tile.quest.reward && (
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs">
+                          <span className="text-muted-foreground">Reward:</span>
+                          {formatResourcesWithIcons(tile.quest.reward, false)}
+                          {tile.quest.reward.vpFlat && (
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <Trophy className="w-3 h-3 text-orange-500" />
+                              <span>+{tile.quest.reward.vpFlat} VP</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                      <Button className="w-full mt-4 flex-shrink-0" size="sm">
+                  Select
+                </Button>
                     </CardContent>
                     </Card>
                     {/* Selection indicator arrow */}

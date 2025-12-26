@@ -189,6 +189,50 @@ export const TileDetailsPanel = observer(() => {
           </CardContent>
         )}
 
+        {selectedTile.template.quest && (
+          <CardContent className="space-y-2">
+            <h4 className="font-medium text-base mb-2">Quest</h4>
+            {(() => {
+              const questProgress = gameStore.getQuestProgress(selectedTile)
+              if (!questProgress) return null
+
+              return (
+                <div className="space-y-2">
+                  <div>
+                    <div className="font-medium text-base">{selectedTile.template.quest.label}</div>
+                    <p className="text-base text-muted-foreground">{selectedTile.template.quest.description}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-base">
+                      <span className="text-muted-foreground">Progress:</span>
+                      <span className={`font-bold ${questProgress.isComplete ? "text-green-500" : ""}`}>
+                        {questProgress.current}/{questProgress.max}
+                      </span>
+                    </div>
+                    {questProgress.isComplete && (
+                      <div className="text-base text-green-500 font-medium">✓ Quest Completed!</div>
+                    )}
+                    {selectedTile.template.quest.reward && (
+                      <div className="flex items-center gap-2 text-base">
+                        <span className="text-muted-foreground">Reward:</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {formatResourcesWithIcons(selectedTile.template.quest.reward, false)}
+                          {selectedTile.template.quest.reward.vpFlat && (
+                            <div className="flex items-center gap-2">
+                              <Trophy className="w-6 h-6 text-orange-500" />
+                              <span className="text-base">+{selectedTile.template.quest.reward.vpFlat} VP</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
+          </CardContent>
+        )}
+
         {selectedTile.template.passiveAbilities && selectedTile.template.passiveAbilities.length > 0 && (
           <CardContent className="space-y-2">
             <h4 className="font-medium text-sm mb-2">Passive Abilities</h4>
@@ -246,7 +290,7 @@ export const TileDetailsPanel = observer(() => {
                   <div key={color} className="flex items-center gap-1.5">
                     <Trophy className="w-3.5 h-3.5 text-orange-500" />
                     <span>
-                      +{vp} VP per {color} tile
+                    +{vp} VP per {color} tile
                     </span>
                   </div>
                 ))}

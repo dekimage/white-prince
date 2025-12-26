@@ -30,20 +30,20 @@ export const GameGrid = observer(() => {
           .map((row, rowIndex) => {
             const y = rowIndex + 2 // Adjust y index since we filtered
             return row.map((tile, x) => {
-              const position = { x, y }
+            const position = { x, y }
               const isPlayerHere = state.playerPosition?.x === x && state.playerPosition?.y === y
-              const isSelected = state.selectedTilePosition?.x === x && state.selectedTilePosition?.y === y
+            const isSelected = state.selectedTilePosition?.x === x && state.selectedTilePosition?.y === y
 
-              return (
-                <GridCell
-                  key={`${x}-${y}`}
-                  tile={tile}
-                  position={position}
-                  isPlayerHere={isPlayerHere}
-                  isSelected={isSelected}
+            return (
+              <GridCell
+                key={`${x}-${y}`}
+                tile={tile}
+                position={position}
+                isPlayerHere={isPlayerHere}
+                isSelected={isSelected}
                   onClick={() => gameStore.selectTile(position)}
-                />
-              )
+              />
+            )
             })
           })
           .flat()}

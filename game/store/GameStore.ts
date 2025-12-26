@@ -58,6 +58,8 @@ class GameStore {
       gameStatus: "playing",
       repeatableActionUsage: {},
       passiveVP: 0,
+      questProgress: {},
+      completedQuests: {},
       focusMode: "grid",
       focusedActionIndex: 0,
     }
@@ -287,6 +289,22 @@ class GameStore {
     const action = currentTile.template.actions[actionIndex]
     if (action) {
       this.claimAction(action.id)
+      
+      // Check if there are any remaining activatable actions
+      const hasRemainingActions = currentTile.template.actions.some((a) => {
+        const usage = this.getActionUsage(currentTile, a.id)
+        if (usage.isComplete) return false
+        
+        // Check if we can afford it
+        if (a.cost && !this.canAfford(a.cost)) return false
+        
+        return true
+      })
+      
+      // If no remaining actions, return focus to grid
+      if (!hasRemainingActions) {
+        this.setFocusMode("grid")
+      }
     }
   }
 
@@ -352,6 +370,8 @@ class GameStore {
       if (action.cost) {
         if (!this.canAfford(action.cost)) return
         this.spendResources(action.cost)
+        // Trigger quest progress for spending resources
+        this.triggerQuestProgress(action.cost)
       }
 
       // Apply effects
@@ -366,22 +386,24 @@ class GameStore {
       this.state.repeatableActionUsage[usageKey] = currentUsage + 1
     } else {
       // One-time action
-      // Check if already claimed
-      if (currentTile.claimedActions.includes(actionId)) return
+    // Check if already claimed
+    if (currentTile.claimedActions.includes(actionId)) return
 
-      // Check costs
-      if (action.cost) {
-        if (!this.canAfford(action.cost)) return
-        this.spendResources(action.cost)
-      }
+    // Check costs
+    if (action.cost) {
+      if (!this.canAfford(action.cost)) return
+      this.spendResources(action.cost)
+        // Trigger quest progress for spending resources
+        this.triggerQuestProgress(action.cost)
+    }
 
-      // Apply effects
-      if (action.effect) {
-        this.gainResources(action.effect)
-      }
+    // Apply effects
+    if (action.effect) {
+      this.gainResources(action.effect)
+    }
 
-      // Mark as claimed
-      currentTile.claimedActions.push(actionId)
+    // Mark as claimed
+    currentTile.claimedActions.push(actionId)
     }
 
     // Check game over
@@ -389,6 +411,97 @@ class GameStore {
 
     // Save
     this.save()
+  }
+
+  private triggerQuestProgress(cost: ResourceCost) {
+    if (!this.state || !this.state.grid) return
+
+    // Iterate through all placed tiles to find quest tiles
+    this.state.grid.forEach((row) => {
+      row.forEach((tile) => {
+        if (!tile || !tile.template.quest) return
+
+        const quest = tile.template.quest
+        const questKey = `${tile.template.id}-${quest.id}`
+        
+        // Skip if quest already completed
+        if (this.state.completedQuests?.[questKey]) return
+
+        // Check if this cost matches the quest trigger
+        let shouldProgress = false
+        switch (quest.triggerType) {
+          case "spend_money":
+            shouldProgress = !!(cost.money && cost.money > 0)
+            break
+          case "spend_reputation":
+            shouldProgress = !!(cost.reputation && cost.reputation > 0)
+            break
+          case "spend_materials":
+            shouldProgress = !!(cost.materials && cost.materials > 0)
+            break
+          case "spend_energy":
+            shouldProgress = !!(cost.energy && cost.energy > 0)
+            break
+        }
+
+        if (shouldProgress) {
+          // Initialize quest progress if needed
+          if (!this.state.questProgress) {
+            this.state.questProgress = {}
+          }
+          const currentProgress = this.state.questProgress[questKey] || 0
+          const newProgress = currentProgress + 1
+
+          // Update progress
+          this.state.questProgress[questKey] = newProgress
+
+          // Check if quest is complete
+          if (newProgress >= quest.maxProgress) {
+            this.completeQuest(tile, quest)
+          }
+        }
+      })
+    })
+  }
+
+  private completeQuest(tile: PlacedTile, quest: Quest) {
+    if (!this.state) return
+
+    const questKey = `${tile.template.id}-${quest.id}`
+
+    // Mark as completed
+    if (!this.state.completedQuests) {
+      this.state.completedQuests = {}
+    }
+    this.state.completedQuests[questKey] = true
+
+    // Apply reward
+    if (quest.reward) {
+      this.gainResources(quest.reward)
+      if (quest.reward.vpFlat) {
+        if (!this.state.passiveVP) {
+          this.state.passiveVP = 0
+        }
+        this.state.passiveVP += quest.reward.vpFlat
+      }
+    }
+
+    console.log(`[Quest] ${tile.template.name} - ${quest.label} completed! Reward applied.`)
+  }
+
+  getQuestProgress(tile: PlacedTile): { current: number; max: number; isComplete: boolean } | null {
+    if (!this.state || !tile.template.quest) return null
+
+    const quest = tile.template.quest
+    const questKey = `${tile.template.id}-${quest.id}`
+    const current = this.state.questProgress?.[questKey] || 0
+    const isComplete = this.state.completedQuests?.[questKey] || false
+
+    return {
+      current,
+      max: quest.maxProgress,
+      isComplete,
+    }
   }
 
   getActionUsage(tile: PlacedTile, actionId: string): { current: number; max: number; isComplete: boolean } {
@@ -541,6 +654,8 @@ class GameStore {
         gameStatus: "playing",
         repeatableActionUsage: {},
         passiveVP: 0,
+        questProgress: {},
+        completedQuests: {},
         focusMode: "grid",
         focusedActionIndex: 0,
       }

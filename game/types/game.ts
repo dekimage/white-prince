@@ -37,6 +37,19 @@ export interface PassiveAbility {
   reward: ResourceCost & { vpFlat?: number }; // Reward when triggered (resources and/or VP)
 }
 
+export interface Quest {
+  id: string;
+  label: string;
+  description: string;
+  triggerType:
+    | "spend_money"
+    | "spend_reputation"
+    | "spend_materials"
+    | "spend_energy"; // What action triggers progress
+  maxProgress: number; // Target count (e.g., 3, 5)
+  reward: ResourceCost & { vpFlat?: number }; // Reward when quest completes
+}
+
 export interface VPLogic {
   flat?: number;
   perColorType?: {
@@ -58,6 +71,7 @@ export interface TileTemplate {
   placementCost?: ResourceCost;
   actions?: TileAction[];
   passiveAbilities?: PassiveAbility[]; // Passive abilities that trigger when placing tiles of specific colors
+  quest?: Quest; // Quest that tracks progress and gives rewards
   vpLogic?: VPLogic;
 }
 
@@ -87,6 +101,8 @@ export interface GameState {
   lossReason?: string;
   repeatableActionUsage?: Record<string, number>; // Track global repeatable action usage: "tileId-actionId" -> count
   passiveVP?: number; // Track VP earned from passive abilities
+  questProgress?: Record<string, number>; // Track quest progress: "tileId-questId" -> current progress
+  completedQuests?: Record<string, boolean>; // Track completed quests: "tileId-questId" -> true
   focusMode?: "grid" | "details"; // Focus mode: grid or details panel
   focusedActionIndex?: number; // Index of focused action in details panel
 }
