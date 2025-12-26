@@ -8,7 +8,7 @@ export const STARTER_TILE: TileTemplate = {
   color: "starter",
   type: "starter",
   doors: { N: true, E: true, S: true, W: true },
-  backgroundImageUrl: "/cozy-starting-room-with-warm-lighting.jpg",
+  backgroundImageUrl: "/cozy-starting-room-with-warm-lighting.jpg.jpg",
   draftingCost: 0, // Starter tile is free
   actions: [
     {
@@ -29,9 +29,18 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: false, E: true, S: true, W: false },
-    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg",
+    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg.jpg",
     draftingCost: 3,
-    vpLogic: { flat: 15 },
+    actions: [
+      {
+        id: "monument-dedication",
+        label: "Dedicate the Monument",
+        description: "Dedicate the monument to the community",
+        cost: { money: 3, materials: 3, reputation: 1 },
+        effect: { vpFlat: 8 },
+        maxUses: 2,
+      },
+    ],
   },
   {
     id: "vp-gallery",
@@ -40,17 +49,17 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/art-gallery.png",
+    backgroundImageUrl: "/art-gallery.png.png",
     draftingCost: 1,
-    vpLogic: { flat: 10 },
-    actions: [
-      {
-        id: "gallery-culture",
-        label: "Support Local Artists",
-        description: "Gain reputation from cultural engagement",
-        effect: { reputation: 3 },
-      },
-    ],
+    vpLogic: { flat: 3 },
+    // actions: [
+    //   {
+    //     id: "gallery-culture",
+    //     label: "Support Local Artists",
+    //     description: "Gain reputation from cultural engagement",
+    //     effect: { reputation: 3 },
+    //   },
+    // ],
   },
   {
     id: "vp-library",
@@ -59,9 +68,18 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/grand-library-with-tall-bookshelves.jpg",
+    backgroundImageUrl: "/grand-library-with-tall-bookshelves.jpg.jpg",
     draftingCost: 2,
-    vpLogic: { flat: 12, perColorType: { blue: 2 } },
+    // vpLogic: { flat: 12, perColorType: { blue: 2 } },
+    actions: [
+      {
+        id: "library-knowledge",
+        label: "Share Knowledge",
+        description: "Share knowledge with the community",
+        cost: { money: 4, materials: 4 },
+        effect: { vpFlat: 7, reputation: 2 },
+      },
+    ],
   },
   {
     id: "vp-temple",
@@ -70,9 +88,9 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/sacred-temple-interior-with-candles.jpg",
+    backgroundImageUrl: "/sacred-temple-interior-with-candles.jpg.jpg",
     draftingCost: 1,
-    vpLogic: { flat: 8, perColorType: { purple: 3 } },
+    vpLogic: { perColorType: { purple: 1 } },
   },
   {
     id: "vp-garden",
@@ -81,15 +99,15 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/royal-garden-with-fountains-and-flowers.jpg",
+    backgroundImageUrl: "/royal-garden-with-fountains-and-flowers.jpg.png",
     draftingCost: 1,
-    vpLogic: { flat: 10 },
     actions: [
       {
         id: "garden-rest",
         label: "Recharge Outdoors",
         description: "Find balance and restore energy",
-        effect: { energy: 3 },
+        cost: { reputation: 3, materials: 3 },
+        effect: { vpFlat: 5, energy: 3 },
       },
     ],
   },
@@ -100,9 +118,17 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: true, S: false, W: true },
-    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg",
+    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg.jpg",
     draftingCost: 3,
-    vpLogic: { flat: 14 },
+    actions: [
+      {
+        id: "memorial-dedication",
+        label: "Dedicate the Memorial",
+        description: "Dedicate the memorial to the community",
+        cost: { money: 6, materials: 3, reputation: 3 },
+        effect: { vpFlat: 16 },
+      },
+    ],
   },
   {
     id: "vp-safety",
@@ -111,15 +137,15 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/ancient-stone-monument-ruins.jpg",
+    backgroundImageUrl: "/community-safety-station.jpg.jpg",
     draftingCost: 1,
-    vpLogic: { flat: 11 },
     actions: [
       {
         id: "safety-patrol",
         label: "Community Watch",
         description: "Organize neighbourhood watch and build trust",
-        effect: { reputation: 4 },
+        cost: { money: 4, materials: 3 },
+        effect: { vpFlat: 6, reputation: 2 },
       },
     ],
   },
@@ -130,15 +156,15 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/grand-library-with-tall-bookshelves.jpg",
+    backgroundImageUrl: "/community-learning-center-classroom.jpg.jpg",
     draftingCost: 1,
-    vpLogic: { flat: 9, perColorType: { purple: 2 } },
     actions: [
       {
         id: "learning-center-share",
         label: "Share Knowledge",
         description: "Teach and learn from community members",
-        effect: { reputation: 3 },
+        cost: { money: 5, materials: 3 },
+        effect: { vpFlat: 6, whitehats: 2 },
       },
     ],
   },
@@ -149,16 +175,15 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/sacred-temple-interior-with-candles.jpg",
+    backgroundImageUrl: "/community-health-clinic-interior.jpg.jpg",
     draftingCost: 2,
-    vpLogic: { flat: 13 },
     actions: [
       {
         id: "clinic-care",
         label: "Provide Care",
         description: "Offer health services and build community wellness",
-        cost: { energy: 2 },
-        effect: { reputation: 5 },
+        cost: { money: 8, materials: 4 },
+        effect: { vpFlat: 10, energy: 2, reputation: 1 },
       },
     ],
   },
@@ -169,15 +194,15 @@ export const TILE_DECK: TileTemplate[] = [
     color: "orange",
     type: "vp",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/art-gallery.png",
+    backgroundImageUrl: "/youth-community-center-activities.jpg.jpg",
     draftingCost: 2,
-    vpLogic: { flat: 12, perColorType: { green: 1 } },
     actions: [
       {
         id: "youth-mentor",
         label: "Mentor Youth",
         description: "Guide and inspire young community members",
-        effect: { reputation: 4 },
+        cost: { money: 6, materials: 2, reputation: 2 },
+        effect: { vpFlat: 12 },
       },
     ],
   },
@@ -190,7 +215,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg",
+    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -208,7 +233,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg",
+    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg.jpg",
     draftingCost: 2,
     actions: [
       {
@@ -228,7 +253,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/gold-mine-cave-with-ore.jpg",
+    backgroundImageUrl: "/urban-recycling-center-industrial.jpg.png",
     draftingCost: 1,
     actions: [
       {
@@ -247,7 +272,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/treasure-room-filled-with-gold-coins.jpg",
+    backgroundImageUrl: "/city-grants-office-interior.jpg.jpg",
     draftingCost: 3,
     actions: [
       {
@@ -265,7 +290,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/medieval-tavern-with-wooden-tables.jpg",
+    backgroundImageUrl: "/community-cafe-cozy-interior.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -284,7 +309,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: false, W: true },
-    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg",
+    backgroundImageUrl: "/business-partnership-hub-meeting.jpg.jpg",
     draftingCost: 2,
     actions: [
       {
@@ -311,7 +336,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg",
+    backgroundImageUrl: "/local-business-sponsors-meeting.jpg.jpg",
     draftingCost: 2,
     actions: [
       {
@@ -338,7 +363,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/treasure-room-filled-with-gold-coins.jpg",
+    backgroundImageUrl: "/community-investment-fund-concept.jpg.jpg",
     draftingCost: 3,
     actions: [
       {
@@ -366,7 +391,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: true, S: false, W: true },
-    backgroundImageUrl: "/busy-marketplace-with-stalls.jpg",
+    backgroundImageUrl: "/community-fundraising-event.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -384,7 +409,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "green",
     type: "economy",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/grand-bank-interior-with-marble.jpg",
+    backgroundImageUrl: "/local-business-alliance-meeting.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -405,7 +430,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg",
+    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -423,7 +448,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg",
+    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -441,7 +466,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/blacksmith-forge-with-anvil-and-fire.jpg",
+    backgroundImageUrl: "/security-innovation-lab-technology.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -461,7 +486,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/construction-site-with-scaffolding.jpg",
+    backgroundImageUrl: "/construction-site-with-scaffolding.jpg.webp",
     draftingCost: 3,
     actions: [
       {
@@ -480,7 +505,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/lumber-mill-with-stacked-wood.jpg",
+    backgroundImageUrl: "/lumber-mill-with-stacked-wood.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -500,7 +525,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: false, W: true },
-    backgroundImageUrl: "/construction-site-with-scaffolding.jpg",
+    backgroundImageUrl: "/community-security-center-modern.jpg.avif",
     draftingCost: 2,
     actions: [
       {
@@ -520,7 +545,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg",
+    backgroundImageUrl: "/public-infrastructure-funding-concept.jpg.jpg",
     draftingCost: 2,
     actions: [
       {
@@ -538,7 +563,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg",
+    backgroundImageUrl: "/innovation-grant-office-startup-support.jpg.jpg",
     draftingCost: 2,
     actions: [
       {
@@ -558,7 +583,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/craftsman-workshop-with-tools.jpg",
+    backgroundImageUrl: "/community-tech-hub-modern.jpg.jpg",
     draftingCost: 3,
     actions: [
       {
@@ -576,7 +601,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "blue",
     type: "build",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/stone-quarry-with-cut-blocks.jpg",
+    backgroundImageUrl: "/neighbourhood-maintenance-center.jpg.webp",
     draftingCost: 1,
     actions: [
       {
@@ -597,7 +622,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-town-square-gathering.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -615,7 +640,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/volunteer-collective-teamwork.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -634,7 +659,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/city-council-chamber-interior.jpg.jpg",
     draftingCost: 3,
     actions: [
       {
@@ -653,7 +678,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-training-workshop.jpg.jpg",
     draftingCost: 1,
     actions: [
       {
@@ -672,7 +697,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-event-space-celebration.jpg.png",
     draftingCost: 1,
     actions: [
       {
@@ -693,7 +718,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: false, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-investment-challenge-concept.jpg.jpg",
     draftingCost: 2,
     quest: {
       id: "quest-investment-tracker",
@@ -711,7 +736,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: false, E: true, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/infrastructure-building-community-project.jpg.png",
     draftingCost: 2,
     quest: {
       id: "quest-materials-tracker",
@@ -730,7 +755,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: false, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/social-impact-measurement-community.jpg.png",
     draftingCost: 3,
     quest: {
       id: "quest-reputation-tracker",
@@ -748,7 +773,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: false },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-effort-collaboration.jpg.jpg",
     draftingCost: 2,
     quest: {
       id: "quest-energy-tracker",
@@ -766,7 +791,7 @@ export const TILE_DECK: TileTemplate[] = [
     color: "purple",
     type: "social",
     doors: { N: true, E: true, S: true, W: true },
-    backgroundImageUrl: "/placeholder.svg?height=400&width=400",
+    backgroundImageUrl: "/community-support-center-collaboration.jpg.jpg",
     draftingCost: 1,
     quest: {
       id: "quest-mixed-tracker",

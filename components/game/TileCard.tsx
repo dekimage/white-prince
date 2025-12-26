@@ -74,6 +74,11 @@ export const TileCard: React.FC<TileCardProps> = ({
         color: "text-white",
         label: "Whitehats",
       },
+      vpFlat: {
+        icon: <Trophy className="w-4 h-4" />,
+        color: "text-orange-500",
+        label: "VP",
+      },
     };
 
     return Object.entries(resources)

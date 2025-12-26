@@ -573,7 +573,7 @@ class GameStore {
           }
         });
       }
-      // Add effects as positive values
+      // Add effects as positive values (including VP from effect)
       if (action.effect) {
         Object.keys(action.effect).forEach((key) => {
           const effectKey = key as keyof ResourceCost;
@@ -584,9 +584,14 @@ class GameStore {
           }
         });
       }
-      // Add VP if any
+      // Legacy support: Add VP from separate vpFlat property (deprecated, use effect.vpFlat instead)
       if (action.vpFlat) {
-        resourceChanges.vpFlat = action.vpFlat;
+        resourceChanges.vpFlat = (resourceChanges.vpFlat || 0) + action.vpFlat;
+        // Also add to passiveVP for backward compatibility
+        if (!this.state.passiveVP) {
+          this.state.passiveVP = 0;
+        }
+        this.state.passiveVP += action.vpFlat;
       }
       this.addLogMessage(`You used ${action.label}`, resourceChanges);
     } else {
@@ -621,7 +626,7 @@ class GameStore {
           }
         });
       }
-      // Add effects as positive values
+      // Add effects as positive values (including VP from effect)
       if (action.effect) {
         Object.keys(action.effect).forEach((key) => {
           const effectKey = key as keyof ResourceCost;
@@ -632,9 +637,14 @@ class GameStore {
           }
         });
       }
-      // Add VP if any
+      // Legacy support: Add VP from separate vpFlat property (deprecated, use effect.vpFlat instead)
       if (action.vpFlat) {
-        resourceChanges.vpFlat = action.vpFlat;
+        resourceChanges.vpFlat = (resourceChanges.vpFlat || 0) + action.vpFlat;
+        // Also add to passiveVP for backward compatibility
+        if (!this.state.passiveVP) {
+          this.state.passiveVP = 0;
+        }
+        this.state.passiveVP += action.vpFlat;
       }
       this.addLogMessage(`You used ${action.label}`, resourceChanges);
     }
@@ -868,6 +878,13 @@ class GameStore {
     if (effect.materials) this.state.resources.materials += effect.materials;
     if (effect.reputation) this.state.resources.reputation += effect.reputation;
     if (effect.whitehats) this.state.resources.whitehats += effect.whitehats;
+    // Handle VP from effects (only granted when cost is paid)
+    if (effect.vpFlat) {
+      if (!this.state.passiveVP) {
+        this.state.passiveVP = 0;
+      }
+      this.state.passiveVP += effect.vpFlat;
+    }
   }
 
   getPassiveAbilitiesForTile(tile: PlacedTile) {

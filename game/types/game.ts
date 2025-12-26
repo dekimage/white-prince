@@ -18,6 +18,7 @@ export interface ResourceCost {
   reputation?: number;
   energy?: number;
   whitehats?: number;
+  vpFlat?: number; // VP can be granted as part of effects
 }
 
 export interface TileAction {

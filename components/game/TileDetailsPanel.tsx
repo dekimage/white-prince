@@ -146,7 +146,8 @@ export const TileDetailsPanel = observer(() => {
                       <span className="text-muted-foreground">Reward:</span>
                       <div className="flex items-center gap-2 flex-wrap">
                         {action.effect && Object.keys(action.effect).length > 0 && formatResourcesWithIcons(action.effect, false)}
-                        {action.vpFlat && (
+                        {/* Legacy support: Show vpFlat from separate property if not in effect */}
+                        {action.vpFlat && !action.effect?.vpFlat && (
                           <div className="flex items-center gap-2">
                             <Trophy className="w-6 h-6 text-orange-500" />
                             <span className="text-base">+{action.vpFlat} VP</span>
@@ -333,6 +334,11 @@ function formatResourcesWithIcons(resources: Record<string, number>, isCost: boo
       icon: <GraduationCap className="w-7 h-7" />,
       color: "text-white",
       label: "Whitehats",
+    },
+    vpFlat: {
+      icon: <Trophy className="w-7 h-7" />,
+      color: "text-orange-500",
+      label: "VP",
     },
   }
 
