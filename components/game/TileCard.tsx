@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { TileTemplate, ResourceCost } from "@/game/types/game";
 import { getDoorAfterRotation } from "@/game/engine/rotation";
+import { gameConfig } from "@/game/config";
 
 interface TileCardProps {
   tile: TileTemplate;
@@ -151,42 +152,46 @@ export const TileCard: React.FC<TileCardProps> = ({
           </div>
         )}
 
-        {/* Door indicators */}
-        {doors.N && (
-          <div className="absolute top-2 left-1/2 -translate-x-1/2">
-            <ChevronUp
-              className={`${
-                scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
-              } text-white drop-shadow-lg stroke-[3]`}
-            />
-          </div>
-        )}
-        {doors.S && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-            <ChevronDown
-              className={`${
-                scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
-              } text-white drop-shadow-lg stroke-[3]`}
-            />
-          </div>
-        )}
-        {doors.E && (
-          <div className="absolute right-2 top-1/2 -translate-y-1/2">
-            <ChevronRight
-              className={`${
-                scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
-              } text-white drop-shadow-lg stroke-[3]`}
-            />
-          </div>
-        )}
-        {doors.W && (
-          <div className="absolute left-2 top-1/2 -translate-y-1/2">
-            <ChevronLeft
-              className={`${
-                scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
-              } text-white drop-shadow-lg stroke-[3]`}
-            />
-          </div>
+        {/* Door indicators - only show if arrowKeys feature is enabled */}
+        {gameConfig.features.arrowKeys && (
+          <>
+            {doors.N && (
+              <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                <ChevronUp
+                  className={`${
+                    scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
+                  } text-white drop-shadow-lg stroke-[3]`}
+                />
+              </div>
+            )}
+            {doors.S && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                <ChevronDown
+                  className={`${
+                    scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
+                  } text-white drop-shadow-lg stroke-[3]`}
+                />
+              </div>
+            )}
+            {doors.E && (
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <ChevronRight
+                  className={`${
+                    scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
+                  } text-white drop-shadow-lg stroke-[3]`}
+                />
+              </div>
+            )}
+            {doors.W && (
+              <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                <ChevronLeft
+                  className={`${
+                    scale === 0.5 ? "w-5 h-5" : "w-10 h-10"
+                  } text-white drop-shadow-lg stroke-[3]`}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
       <div className="flex-shrink-0 flex items-center justify-center pt-2">

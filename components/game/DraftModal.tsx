@@ -10,6 +10,7 @@ import type { ResourceCost } from "@/game/types/game"
 import { getDoorAfterRotation } from "@/game/engine/rotation"
 import { calculateRotation } from "@/game/engine/rotation"
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ArrowUp, Dice1 } from "lucide-react"
+import { gameConfig } from "@/game/config"
 
 export const DraftModal = observer(() => {
   const { state } = gameStore
@@ -233,26 +234,30 @@ export const DraftModal = observer(() => {
                           <GraduationCap className="w-6 h-6 text-white" />
                         </div>
                         
-                        {/* Door indicators */}
-                        {doors.N && (
-                          <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                            <ChevronUp className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
-                          </div>
-                        )}
-                        {doors.S && (
-                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-                            <ChevronDown className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
-                          </div>
-                        )}
-                        {doors.E && (
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                            <ChevronRight className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
-                          </div>
-                        )}
-                        {doors.W && (
-                          <div className="absolute left-2 top-1/2 -translate-y-1/2">
-                            <ChevronLeft className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
-                          </div>
+                        {/* Door indicators - only show if arrowKeys feature is enabled */}
+                        {gameConfig.features.arrowKeys && (
+                          <>
+                            {doors.N && (
+                              <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                                <ChevronUp className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
+                              </div>
+                            )}
+                            {doors.S && (
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                                <ChevronDown className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
+                              </div>
+                            )}
+                            {doors.E && (
+                              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                <ChevronRight className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
+                              </div>
+                            )}
+                            {doors.W && (
+                              <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                                <ChevronLeft className="w-10 h-10 text-white drop-shadow-lg stroke-[3]" />
+                              </div>
+                            )}
+                          </>
                         )}
               </div>
               <CardHeader className="pb-2 flex-shrink-0">

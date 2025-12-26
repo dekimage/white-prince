@@ -49,7 +49,7 @@ export const GameOverModal = observer(() => {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Tiles Placed:</span>
-            <span className="font-medium">{tilesPlaced}/30</span>
+            <span className="font-medium">{tilesPlaced}/25</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Energy Remaining:</span>

@@ -12,6 +12,7 @@ import {
   Check,
 } from "lucide-react";
 import { gameStore } from "@/game/store/GameStore";
+import { gameConfig } from "@/game/config";
 
 interface GridCellProps {
   tile: PlacedTile | null;
@@ -75,26 +76,30 @@ export const GridCell = observer(
         {/* Black overlay with 20% opacity */}
         <div className="absolute inset-0 bg-black/20" />
 
-        {/* Door indicators */}
-        {doors.N && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2">
-            <ChevronUp className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
-          </div>
-        )}
-        {doors.S && (
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-            <ChevronDown className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
-          </div>
-        )}
-        {doors.E && (
-          <div className="absolute right-0 top-1/2 -translate-y-1/2">
-            <ChevronRight className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
-          </div>
-        )}
-        {doors.W && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2">
-            <ChevronLeft className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
-          </div>
+        {/* Door indicators - only show if arrowKeys feature is enabled */}
+        {gameConfig.features.arrowKeys && (
+          <>
+            {doors.N && (
+              <div className="absolute top-0 left-1/2 -translate-x-1/2">
+                <ChevronUp className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
+              </div>
+            )}
+            {doors.S && (
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+                <ChevronDown className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
+              </div>
+            )}
+            {doors.E && (
+              <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                <ChevronRight className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
+              </div>
+            )}
+            {doors.W && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                <ChevronLeft className="w-8 h-8 text-white drop-shadow-lg stroke-[3]" />
+              </div>
+            )}
+          </>
         )}
 
         {/* Player avatar */}

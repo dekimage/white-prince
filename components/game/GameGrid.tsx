@@ -25,13 +25,10 @@ export const GameGrid = observer(() => {
           maxWidth: `${GRID_WIDTH * 150}px`,
         }}
       >
-        {state.grid
-          .filter((_, y) => y >= 2) // Skip top 2 rows (y < 2)
-          .map((row, rowIndex) => {
-            const y = rowIndex + 2 // Adjust y index since we filtered
-            return row.map((tile, x) => {
+        {state.grid.map((row, y) => {
+          return row.map((tile, x) => {
             const position = { x, y }
-              const isPlayerHere = state.playerPosition?.x === x && state.playerPosition?.y === y
+            const isPlayerHere = state.playerPosition?.x === x && state.playerPosition?.y === y
             const isSelected = state.selectedTilePosition?.x === x && state.selectedTilePosition?.y === y
 
             return (
@@ -41,12 +38,11 @@ export const GameGrid = observer(() => {
                 position={position}
                 isPlayerHere={isPlayerHere}
                 isSelected={isSelected}
-                  onClick={() => gameStore.selectTile(position)}
+                onClick={() => gameStore.selectTile(position)}
               />
             )
-            })
           })
-          .flat()}
+        }).flat()}
       </div>
     </div>
   )
