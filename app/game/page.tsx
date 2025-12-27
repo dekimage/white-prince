@@ -14,14 +14,13 @@ import { KeyboardControls } from "@/components/game/KeyboardControls";
 import { ViewAllTilesModal } from "@/components/game/ViewAllTilesModal";
 import { SoundEffects } from "@/components/game/SoundEffects";
 import { Button } from "@/components/ui/button";
-import { Settings, Moon, Sun, Music, VolumeX } from "lucide-react";
+import { Settings, Music, VolumeX } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from "next-themes";
 import { SoundProvider, useSoundContext } from "@/contexts/SoundContext";
 
 function GamePageContent() {
@@ -29,8 +28,6 @@ function GamePageContent() {
   const router = useRouter();
   const isNewGame = searchParams.get("new") === "true";
   const [isInitialized, setIsInitialized] = React.useState(false);
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [showAllTiles, setShowAllTiles] = useState(false);
   const { playBackgroundMusic, isMusicEnabled, toggleMusic } =
     useSoundContext();
@@ -43,10 +40,6 @@ function GamePageContent() {
       playBackgroundMusic();
     }
   }, [isInitialized, isMusicEnabled, playBackgroundMusic]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   console.log("[v0] GamePageContent rendered, isNewGame:", isNewGame);
 
@@ -113,35 +106,18 @@ function GamePageContent() {
           <ResourceBar />
           <div className="flex-1 flex items-center justify-end gap-2">
             {/* Music toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMusic}
-                aria-label={isMusicEnabled ? "Disable music" : "Enable music"}
-              >
-                {isMusicEnabled ? (
-                  <Music className="w-5 h-5" />
-                ) : (
-                  <VolumeX className="w-5 h-5" />
-                )}
-              </Button>
-            )}
-            {/* Dark mode toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMusic}
+              aria-label={isMusicEnabled ? "Disable music" : "Enable music"}
+            >
+              {isMusicEnabled ? (
+                <Music className="w-5 h-5" />
+              ) : (
+                <VolumeX className="w-5 h-5" />
+              )}
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
