@@ -257,12 +257,6 @@ export const TileCard: React.FC<TileCardProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap text-xs">
                     {formatResourcesWithIcons(passive.reward, false)}
-                    {passive.reward.vpFlat && (
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <Trophy className="w-3 h-3 text-orange-500" />
-                        <span>+{passive.reward.vpFlat} VP</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -312,12 +306,6 @@ export const TileCard: React.FC<TileCardProps> = ({
                 <div className="flex items-center gap-1.5 flex-wrap text-xs">
                   <span className="text-muted-foreground">Reward:</span>
                   {formatResourcesWithIcons(tile.quest.reward, false)}
-                  {tile.quest.reward.vpFlat && (
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <Trophy className="w-3 h-3 text-orange-500" />
-                      <span>+{tile.quest.reward.vpFlat} VP</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>

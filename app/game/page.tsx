@@ -192,8 +192,8 @@ function GamePageContent() {
 
       {/* Controls hint */}
       <div className="border-t bg-card px-4 py-2 text-center text-xs text-muted-foreground">
-        Use WASD or Arrow Keys to move • Click tiles to inspect • Click arrows
-        to move
+        Use WASD or Arrow Keys to move • Click tiles to inspect • Space/Enter to
+        interact • Escape to lose focus to move
       </div>
     </div>
   );

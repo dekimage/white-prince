@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { observer } from "mobx-react-lite"
 import { gameStore } from "@/game/store/GameStore"
 import {
@@ -13,10 +14,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Trophy, XCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { HowToPlayModal } from "@/components/HowToPlayModal"
 
 export const GameOverModal = observer(() => {
   const { state, victoryPoints, tilesPlaced } = gameStore
   const router = useRouter()
+  const [showHowToPlay, setShowHowToPlay] = useState(false)
 
   if (!state) return null
 
@@ -61,9 +64,15 @@ export const GameOverModal = observer(() => {
           <Button variant="outline" onClick={() => router.push("/")}>
             Home
           </Button>
+          {!isWin && (
+            <Button variant="outline" onClick={() => setShowHowToPlay(true)}>
+              How to Play
+            </Button>
+          )}
           <Button onClick={() => gameStore.resetGame()}>Play Again</Button>
         </DialogFooter>
       </DialogContent>
+      <HowToPlayModal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
     </Dialog>
   )
 })

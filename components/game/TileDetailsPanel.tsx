@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { isAdjacent, getDirectionBetween } from "@/game/engine/movement"
 import { getDoorAfterRotation } from "@/game/engine/rotation"
+import { gameConfig } from "@/game/config"
 import { Move, Zap, Coins, Hammer, Users, Trophy, GraduationCap } from "lucide-react"
 import type { Direction } from "@/game/types/game"
 
@@ -40,15 +41,18 @@ export const TileDetailsPanel = observer(() => {
     const direction = getDirectionBetween(state.playerPosition, selectedTile.position)
     if (!direction) return false
 
-    // Check if current tile has exit door
-    const hasExitDoor = getDoorAfterRotation(currentTile.template.doors, currentTile.rotation, direction)
-    if (!hasExitDoor) return false
+    // If arrowKeys feature is enabled, check doors. Otherwise, allow free movement
+    if (gameConfig.features.arrowKeys) {
+      // Check if current tile has exit door
+      const hasExitDoor = getDoorAfterRotation(currentTile.template.doors, currentTile.rotation, direction)
+      if (!hasExitDoor) return false
 
-    // Check if target tile has entrance door
-    const oppositeDirMap: Record<Direction, Direction> = { N: "S", S: "N", E: "W", W: "E" }
-    const oppositeDir = oppositeDirMap[direction]
-    const hasEntranceDoor = getDoorAfterRotation(selectedTile.template.doors, selectedTile.rotation, oppositeDir)
-    if (!hasEntranceDoor) return false
+      // Check if target tile has entrance door
+      const oppositeDirMap: Record<Direction, Direction> = { N: "S", S: "N", E: "W", W: "E" }
+      const oppositeDir = oppositeDirMap[direction]
+      const hasEntranceDoor = getDoorAfterRotation(selectedTile.template.doors, selectedTile.rotation, oppositeDir)
+      if (!hasEntranceDoor) return false
+    }
 
     return true
   }
@@ -105,7 +109,9 @@ export const TileDetailsPanel = observer(() => {
                   ? "Not adjacent"
                   : state.resources.energy < 1
                     ? "Not enough energy"
-                    : "No connecting door"}
+                    : gameConfig.features.arrowKeys
+                      ? "No connecting door"
+                      : "Cannot move"}
               </p>
             )}
           </CardContent>
@@ -218,12 +224,6 @@ export const TileDetailsPanel = observer(() => {
                         <span className="text-muted-foreground">Reward:</span>
                         <div className="flex items-center gap-2 flex-wrap">
                           {formatResourcesWithIcons(selectedTile.template.quest.reward, false)}
-                          {selectedTile.template.quest.reward.vpFlat && (
-                            <div className="flex items-center gap-2">
-                              <Trophy className="w-6 h-6 text-orange-500" />
-                              <span className="text-base">+{selectedTile.template.quest.reward.vpFlat} VP</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
@@ -260,12 +260,6 @@ export const TileDetailsPanel = observer(() => {
                         <span className="text-muted-foreground">Reward:</span>
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {formatResourcesWithIcons(passive.reward, false)}
-                          {passive.reward.vpFlat && (
-                            <div className="flex items-center gap-1">
-                              <Trophy className="w-3.5 h-3.5 text-orange-500" />
-                              <span>+{passive.reward.vpFlat} VP</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>

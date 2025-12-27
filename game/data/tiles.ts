@@ -9,13 +9,27 @@ export const STARTER_TILE: TileTemplate = {
   type: "starter",
   doors: { N: true, E: true, S: true, W: true },
   backgroundImageUrl: "/cozy-starting-room-with-warm-lighting.jpg.jpg",
-  draftingCost: 0, // Starter tile is free
+  draftingCost: 0,
   actions: [
     {
       id: "starter-energy",
       label: "Regroup",
       description: "Take a breather and plan the next move.",
       effect: { energy: 5 },
+    },
+    {
+      id: "starter-whitehats",
+      label: "Recruit Whitehats",
+      description: "Recruit whitehats to help with the neighbourhood good.",
+      cost: { money: 5 },
+      effect: { whitehats: 5 },
+    },
+    {
+      id: "starter-materials",
+      label: "Gather Materials",
+      description: "Gather materials to help with the neighbourhood good.",
+      cost: { reputation: 5, materials: 5, money: 5 },
+      effect: { vpFlat: 10 },
     },
   ],
 };
@@ -760,7 +774,8 @@ export const TILE_DECK: TileTemplate[] = [
     quest: {
       id: "quest-reputation-tracker",
       label: "Reputation Investment",
-      description: "Spend reputation on 3 actions. Reward: 10 Money + 8 VP",
+      description:
+        "Spend reputation on 3 actions. Reward: 6 Money + 3 VP + 4 Reputation",
       triggerType: "spend_reputation",
       maxProgress: 3,
       reward: { money: 6, vpFlat: 3, reputation: 4 },
@@ -778,7 +793,7 @@ export const TILE_DECK: TileTemplate[] = [
     quest: {
       id: "quest-energy-tracker",
       label: "Energy Contributions",
-      description: "Spend energy on 6 actions. Reward: 6 Reputation + 4 VP",
+      description: "Spend energy on 3 actions. Reward: 5 Reputation + 3 VP",
       triggerType: "spend_energy",
       maxProgress: 3,
       reward: { reputation: 5, vpFlat: 3 },
