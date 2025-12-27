@@ -122,6 +122,6 @@ export interface GameState {
 
 export const GRID_WIDTH = 5;
 export const GRID_HEIGHT = 5;
-export const STARTING_ENERGY = 50;
-export const STARTING_WHITEHATS = 30;
+export const STARTING_ENERGY = 45;
+export const STARTING_WHITEHATS = 35;
 export const WIN_VP_THRESHOLD = 100;

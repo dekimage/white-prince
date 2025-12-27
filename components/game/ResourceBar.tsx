@@ -14,7 +14,7 @@ export const ResourceBar = observer(() => {
   }
 
   return (
-    <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex items-center gap-6 flex-wrap">
       <ResourceItem
         icon={<Zap className="w-6 h-6" />}
         label="Energy"

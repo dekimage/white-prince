@@ -38,8 +38,8 @@ class GameStore {
       .fill(null)
       .map(() => Array(GRID_WIDTH).fill(null));
 
-    // Starting position (center of 5x5 grid)
-    const startPos: Position = { x: 3, y: 3 };
+    // Starting position (always at [2, 2])
+    const startPos: Position = { x: 2, y: 2 };
 
     // Place starter tile
     emptyGrid[startPos.y][startPos.x] = {

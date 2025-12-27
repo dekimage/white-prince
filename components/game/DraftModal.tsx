@@ -11,12 +11,16 @@ import { getDoorAfterRotation } from "@/game/engine/rotation"
 import { calculateRotation } from "@/game/engine/rotation"
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ArrowUp, Dice1 } from "lucide-react"
 import { gameConfig } from "@/game/config"
+import { useSoundContext } from "@/contexts/SoundContext"
 
 export const DraftModal = observer(() => {
   const { state } = gameStore
   const [isHidden, setIsHidden] = useState(false)
   const [selectedCardIndex, setSelectedCardIndex] = useState(1) // Default to center card
   const [focusOnReroll, setFocusOnReroll] = useState(false) // Track if reroll button is focused
+  const { playSound } = useSoundContext()
+
+  // Draft sound removed - no sound when draft dialog opens
 
   // Reset to center when draft options change
   React.useEffect(() => {
@@ -71,6 +75,7 @@ export const DraftModal = observer(() => {
         case " ":
           e.preventDefault()
           if (focusOnReroll) {
+            playSound("reroll");
             gameStore.rerollDraft()
           } else if (state.draftOptions?.[selectedCardIndex]) {
             gameStore.selectDraftTile(state.draftOptions[selectedCardIndex])
@@ -413,7 +418,10 @@ export const DraftModal = observer(() => {
                       className={`${isRerollFocused ? "ring-4 ring-primary ring-offset-2" : ""}`}
                       variant={canReroll ? "default" : "outline"}
                       disabled={!canReroll}
-                      onClick={() => gameStore.rerollDraft()}
+                      onClick={() => {
+                        playSound("reroll");
+                        gameStore.rerollDraft();
+                      }}
                       ref={(el) => {
                         if (isRerollFocused && el) {
                           el.scrollIntoView({ behavior: "smooth", block: "nearest" })
