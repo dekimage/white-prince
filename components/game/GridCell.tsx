@@ -10,6 +10,8 @@ import {
   ChevronRight,
   AlertTriangle,
   Check,
+  HelpCircle,
+  Sparkles,
 } from "lucide-react";
 import { gameStore } from "@/game/store/GameStore";
 import { gameConfig } from "@/game/config";
@@ -58,6 +60,12 @@ export const GridCell = observer(
     // Check tile completion status
     const isComplete = tile ? gameStore.isTileComplete(tile) : false;
     const hasUnusedActions = tile ? gameStore.hasUnusedActions(tile) : false;
+    
+    // Check for quest progress
+    const questProgress = tile ? gameStore.getQuestProgress(tile) : null;
+    
+    // Check for passive abilities
+    const hasPassiveAbilities = tile?.template.passiveAbilities && tile.template.passiveAbilities.length > 0;
 
     return (
       <button
@@ -111,7 +119,28 @@ export const GridCell = observer(
           </div>
         )}
 
-        {/* Action status indicators */}
+        {/* Quest progress indicator - top left */}
+        {questProgress && !questProgress.isComplete && (
+          <div className="absolute top-1 left-1 z-10 flex flex-col items-center gap-0.5">
+            <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center shadow-md border border-orange-600">
+              <HelpCircle className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
+            </div>
+            <div className="text-[9px] font-bold text-white bg-black/60 px-1 py-0.5 rounded shadow-md">
+              {questProgress.current}/{questProgress.max}
+            </div>
+          </div>
+        )}
+
+        {/* Passive ability indicator - bottom left */}
+        {hasPassiveAbilities && (
+          <div className="absolute bottom-1 left-1 z-10">
+            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-md border border-blue-600">
+              <Sparkles className="w-3.5 h-3.5 text-white" />
+            </div>
+          </div>
+        )}
+
+        {/* Action status indicators - top right */}
         {tile.template.actions && tile.template.actions.length > 0 && (
           <div className="absolute top-1 right-1 z-10">
             {isComplete ? (
